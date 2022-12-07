@@ -1,24 +1,36 @@
-module Problem1 (run) where
+module Problem1 (runEasy, runHard) where
 
+import Data.Either
 import Data.List
-import Text.Parsec
+import Data.Void
+import Text.ParserCombinators.Parsec
 
 type Elf = Int
 
-run :: String -> String
-run input = show $ sum . (take 3) . reverse . sort $ parseInput input
+runEasy :: FilePath -> IO String
+runEasy fp = do
+    input <- readFile fp
+    let elves = parse parseInput "Problem1.hs" input
+    case elves of
+        Left e -> return $ error "error parsing" ++ show e
+        Right p -> return (processInputEasy p)
 
-parseInput :: String -> [Elf]
-parseInput input = let lns = lines input
-                   in parseElves lns
+--runHard :: FilePath -> IO String
+--runHard fp = runStdoutLoggingT $ do
+--    input <- parseFile parseInput fp
+--    Just <$> processInputHard input
 
-parseElves :: [String] -> [Elf]
-parseElves [] = []
-parseElves xs = let elf = takeWhile (/= "") xs
-                    rest = dropWhile (/= "") xs
-                in case rest of
-                    [] -> [parseElf elf]
-                    _ -> (parseElf elf):(parseElves $ tail rest)
+parseInput = sepEndBy1 parseInts eol
+         where parseInts = many parseInt
+               parseInt = do
+                    let i = many1 digit
+                    eol
+                    return $ read $ fromRight "0" i
 
-parseElf :: [String] -> Elf
-parseElf = sum . (map read)
+processInputEasy :: [Elf] -> String
+processInputEasy = show . head . reverse . sort
+
+processInputHard :: [Elf] -> String
+processInputHard = show . sum . (take 3) . reverse . sort 
+
+eol = char '\n'

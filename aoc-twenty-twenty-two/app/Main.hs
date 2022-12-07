@@ -1,5 +1,6 @@
 module Main (main) where
 
+import Contorl.Monad.IO.Class
 import System.IO
 import qualified Data.Map as M
 import qualified Data.Maybe as Y
@@ -36,12 +37,16 @@ main = do
     day <- getLine
     putStrLn "Do you want to (T)est or (R)un the code?"
     inputType <- getLine
+    putStrLn "Would you like to run the (E)asy or (H)ard version?"
+    problemType <- getLine
     let fileName = getFileName day inputType
-    (input, handle) <- getInputData fileName
-    let problem = Y.fromJust $ M.lookup day problems
-    let output = problem input
-    putStr output
-    hClose handle
+    case problemType of
+        "E" -> do
+                let problem = Y.fromJust $ M.lookup day problemsEasy
+        "H" -> do
+                let problem = Y.fromJust $ M.lookup day problemsHard
+    output <- problem fileName
+    putStrLn output
 
 
 getFileName :: String -> String -> String
@@ -55,29 +60,56 @@ getInputData fileName = do
                          contents <- hGetContents handle
                          return (contents, handle)
 
-problems ::  M.Map String (String -> String)
-problems = M.fromList [("1", P1.run)
-                      ,("2", P2.run)
-                      ,("3", P3.run)
-                      ,("4", P4.run)
-                      ,("5", P5.run)
-                      ,("6", P6.run)
-                      ,("7", P7.run)
-                      ,("8", P8.run)
-                      ,("9", P9.run)
-                      ,("10", P10.run)
-                      ,("11", P11.run)
-                      ,("12", P12.run)
-                      ,("13", P13.run)
-                      ,("14", P14.run)
-                      ,("15", P15.run)
-                      ,("16", P16.run)
-                      ,("17", P17.run)
-                      ,("18", P18.run)
-                      ,("19", P19.run)
-                      ,("20", P20.run)
-                      ,("21", P21.run)
-                      ,("22", P22.run)
-                      ,("23", P23.run)
-                      ,("24", P24.run)
-                      ,("25", P25.run)]
+problemsEasy :: (MonadIO m) => M.Map String (FilePath -> m String)
+problemsEasy = M.fromList [("1", P1.runEasy)]
+                          --,("2", P2.runEasy)
+                          --,("3", P3.runEasy)
+                          --,("4", P4.runEasy)
+                          --,("5", P5.runEasy)
+                          --,("6", P6.runEasy)
+                          --,("7", P7.runEasy)
+                          --,("8", P8.runEasy)
+                          --,("9", P9.runEasy)
+                          --,("10", P10.runEasy)
+                          --,("11", P11.runEasy)
+                          --,("12", P12.runEasy)
+                          --,("13", P13.runEasy)
+                          --,("14", P14.runEasy)
+                          --,("15", P15.runEasy)
+                          --,("16", P16.runEasy)
+                          --,("17", P17.runEasy)
+                          --,("18", P18.runEasy)
+                          --,("19", P19.runEasy)
+                          --,("20", P20.runEasy)
+                          --,("21", P21.runEasy)
+                          --,("22", P22.runEasy)
+                          --,("23", P23.runEasy)
+                          --,("24", P24.runEasy)
+                          --,("25", P25.runEasy)]
+
+problemsHard :: (MonadIO m) => M.Map String (String -> m String)
+problemsHard = M.fromList []--[("1", P1.runHard)]
+                          --,("2", P2.runHard)
+                          --,("3", P3.runHard)
+                          --,("4", P4.runHard)
+                          --,("5", P5.runHard)
+                          --,("6", P6.runHard)
+                          --,("7", P7.runHard)
+                          --,("8", P8.runHard)
+                          --,("9", P9.runHard)
+                          --,("10", P10.runHard)
+                          --,("11", P11.runHard)
+                          --,("12", P12.runHard)
+                          --,("13", P13.runHard)
+                          --,("14", P14.runHard)
+                          --,("15", P15.runHard)
+                          --,("16", P16.runHard)
+                          --,("17", P17.runHard)
+                          --,("18", P18.runHard)
+                          --,("19", P19.runHard)
+                          --,("20", P20.runHard)
+                          --,("21", P21.runHard)
+                          --,("22", P22.runHard)
+                          --,("23", P23.runHard)
+                          --,("24", P24.runHard)
+                          --,("25", P25.runHard)]
