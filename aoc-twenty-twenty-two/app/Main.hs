@@ -63,11 +63,11 @@ getInputData fileName = do
                          return (contents, handle)
 
 problemsEasy :: M.Map String (FilePath -> IO String)
-problemsEasy = M.fromList [("1", P1.runEasy)]
+problemsEasy = M.fromList [("1", P1.runEasy)
                           --,("2", P2.runEasy)
                           --,("3", P3.runEasy)
                           --,("4", P4.runEasy)
-                          --,("5", P5.runEasy)
+                          ,("5", P5.runEasy)
                           --,("6", P6.runEasy)
                           --,("7", P7.runEasy)
                           --,("8", P8.runEasy)
@@ -87,7 +87,8 @@ problemsEasy = M.fromList [("1", P1.runEasy)]
                           --,("22", P22.runEasy)
                           --,("23", P23.runEasy)
                           --,("24", P24.runEasy)
-                          --,("25", P25.runEasy)]
+                          --,("25", P25.runEasy)
+                          ]
 
 problemsHard :: (MonadIO m) => M.Map String (String -> m String)
 problemsHard = M.fromList []--[("1", P1.runHard)]

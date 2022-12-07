@@ -11,3 +11,4 @@ parseFile parser filepath = do
     case result of
         Left e -> error $ "Failed to parse: " ++ show e
         Right x -> return x
+
