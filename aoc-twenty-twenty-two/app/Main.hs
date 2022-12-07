@@ -1,6 +1,6 @@
 module Main (main) where
 
-import Contorl.Monad.IO.Class
+import Control.Monad.IO.Class
 import System.IO
 import qualified Data.Map as M
 import qualified Data.Maybe as Y
@@ -43,10 +43,12 @@ main = do
     case problemType of
         "E" -> do
                 let problem = Y.fromJust $ M.lookup day problemsEasy
+                output <- problem fileName
+                putStrLn output
         "H" -> do
                 let problem = Y.fromJust $ M.lookup day problemsHard
-    output <- problem fileName
-    putStrLn output
+                output <- problem fileName
+                putStrLn output
 
 
 getFileName :: String -> String -> String
@@ -60,7 +62,7 @@ getInputData fileName = do
                          contents <- hGetContents handle
                          return (contents, handle)
 
-problemsEasy :: (MonadIO m) => M.Map String (FilePath -> m String)
+problemsEasy :: M.Map String (FilePath -> IO String)
 problemsEasy = M.fromList [("1", P1.runEasy)]
                           --,("2", P2.runEasy)
                           --,("3", P3.runEasy)
