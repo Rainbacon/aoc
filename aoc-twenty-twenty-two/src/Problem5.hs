@@ -1,4 +1,4 @@
-module Problem5 (runEasy) where
+module Problem5 where
 
 import qualified Data.Map as M
 import qualified Data.Maybe as Y
@@ -7,14 +7,29 @@ import Text.Megaparsec
 import Text.Megaparsec.Char
 import Utils
 
-type Piles = M.Map Int ([Char])
+type Piles = M.Map Int [Char]
 type Move = (Int, Int, Int)
 type InputType = (Piles, [Move])
 
 runEasy :: FilePath -> IO String
 runEasy fp = do
     input <- parseFile parseInput fp
-    return (show $ fst input)
+    return (processInput input (reverse . (uncurry take)))
+
+runHard :: FilePath -> IO String
+runHard fp = do
+    input <- parseFile parseInput fp
+    return (processInput input (uncurry take))
+
+processInput :: InputType -> ((Int, [Char]) -> [Char]) -> String
+processInput (piles, moves) f = let final = foldl (runMove f) piles moves
+                                in map head $ M.elems final
+
+runMove :: ((Int, [Char]) -> [Char]) -> Piles -> Move -> Piles
+runMove fn p (n, f, t) = let fromPile = Y.fromJust $ M.lookup f p
+                             toPile = Y.fromJust $ M.lookup t p
+                             transit = fn (n, fromPile)
+                         in M.adjust (transit ++) t $ M.adjust (drop n) f p
 
 parseInput :: (Monad m) => ParsecT Void String m InputType
 parseInput = do
@@ -25,16 +40,15 @@ parseInput = do
 
 parsePiles :: (Monad m) => ParsecT Void String m Piles
 parsePiles = do
-              rows <- many parseRow
-              spaceChar
-              nums <- sepBy parseInt (some spaceChar)
+              rows <- sepEndBy1 parseRow eol
+              char ' '
+              nums <- sepEndBy1 parseInt (some (char ' '))
               eol
               return (buildPiles rows nums)
               
 parseRow :: (Monad m) => ParsecT Void String m [Maybe Char]
 parseRow = do
-            maybeCrates <- sepBy (parseCrate <|> parseEmpty) spaceChar 
-            eol
+            maybeCrates <- sepEndBy1 (parseCrate <|> parseEmpty) (char ' ')
             return maybeCrates
 
 parseCrate :: (Monad m) => ParsecT Void String m (Maybe Char)
@@ -73,5 +87,5 @@ reducePile :: [Maybe Char] -> [Char]
 reducePile = (map Y.fromJust) . (filter Y.isJust)
 
 getCol :: [[Maybe Char]] -> Int -> (Int, [Char])
-getCol infLists i = let pile = map (\x -> x !! i) infLists
+getCol infLists i = let pile = map (\x -> x !! (i - 1)) infLists
                     in (i, reducePile pile)

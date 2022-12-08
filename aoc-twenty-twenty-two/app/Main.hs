@@ -90,12 +90,12 @@ problemsEasy = M.fromList [("1", P1.runEasy)
                           --,("25", P25.runEasy)
                           ]
 
-problemsHard :: (MonadIO m) => M.Map String (String -> m String)
-problemsHard = M.fromList []--[("1", P1.runHard)]
+problemsHard :: M.Map String (String -> IO String)
+problemsHard = M.fromList [("1", P1.runHard)
                           --,("2", P2.runHard)
                           --,("3", P3.runHard)
                           --,("4", P4.runHard)
-                          --,("5", P5.runHard)
+                          ,("5", P5.runHard)
                           --,("6", P6.runHard)
                           --,("7", P7.runHard)
                           --,("8", P8.runHard)
@@ -115,4 +115,5 @@ problemsHard = M.fromList []--[("1", P1.runHard)]
                           --,("22", P22.runHard)
                           --,("23", P23.runHard)
                           --,("24", P24.runHard)
-                          --,("25", P25.runHard)]
+                          --,("25", P25.runHard)
+                          ]
