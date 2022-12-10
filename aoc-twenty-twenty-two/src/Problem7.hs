@@ -1,5 +1,6 @@
 module Problem7 where
 
+import qualified Data.List as L
 import qualified Data.Map as M
 import qualified Data.Maybe as Y
 import Data.Void
@@ -29,10 +30,17 @@ runEasy fp = do
     input <- parseFile parseInput fp
     return $ show $ sum $ filter (<= 100000) $ map (sizeDir input) $ M.keys input
 
+runHard :: FilePath -> IO String
+runHard fp = do
+    input <- parseFile parseInput fp
+    let totalSize = sizeDir input "/"
+    let freeNeeded = 30000000 - (70000000 - totalSize)
+    return $ show $ head $ dropWhile (< freeNeeded) $ L.sort $ map (sizeDir input) $ M.keys input
+
 sizeDir :: FileSystem -> String -> Integer
 sizeDir fs name = sum $ map size (Y.fromJust $ M.lookup name fs)
               where size (File s _) = s
-                    size (Dir n) = sizeDir fs n 
+                    size (Dir n) = sizeDir fs (n ++ name)
 
 parseInput :: (Monad m) => ParsecT Void String m FileSystem
 parseInput = do
