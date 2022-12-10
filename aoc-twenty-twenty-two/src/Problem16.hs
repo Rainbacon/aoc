@@ -1,5 +1,7 @@
-module Problem16 (run) where
+module Problem16 (runEasy, runHard) where
 
-run :: String -> String
-run _ = ""
+runEasy :: FilePath -> IO String
+runEasy _ = return ""
 
+runHard :: FilePath -> IO String
+runHard _ = return ""
