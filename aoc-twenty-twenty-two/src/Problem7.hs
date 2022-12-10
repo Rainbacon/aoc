@@ -7,74 +7,88 @@ import Text.Megaparsec
 import Text.Megaparsec.Char
 import Utils
 
-data Command = Change String | ListSource [FileTree]
+data Raw = C String | L | D String | F Integer String
+    deriving (Show)
+data Command = Change String | ListSource [FileObject]
         deriving (Show)
-data FileTree = Dir String (M.Map String FileTree) | File Int String
+data FileObject = Dir String | File Integer String
         deriving (Show)
+type FileSystem = M.Map String [FileObject]
+
+toStr :: Int -> String -> FileSystem -> [String]
+toStr indent path fs = line:(concat (map (toStr' indent fs) (Y.fromJust $ M.lookup path fs)))
+                    where ind = replicate indent ' '
+                          line = ind ++ "- " ++ path
+
+toStr' indent fs (Dir s) = toStr (indent + 2) s fs
+toStr' indent fs (File i n) = [(replicate indent ' ') ++ "  - " ++ show i ++ " " ++ n]
+
 
 runEasy :: FilePath -> IO String
 runEasy fp = do
     input <- parseFile parseInput fp
-    return (show input)
+    return $ show $ sum $ filter (<= 100000) $ map (sizeDir input) $ M.keys input
 
-parseInput :: (Monad m) => ParsecT Void String m FileTree
+sizeDir :: FileSystem -> String -> Integer
+sizeDir fs name = sum $ map size (Y.fromJust $ M.lookup name fs)
+              where size (File s _) = s
+                    size (Dir n) = sizeDir fs n 
+
+parseInput :: (Monad m) => ParsecT Void String m FileSystem
 parseInput = do
-              commands <- sepEndBy1 parseCommand eol
-              let firstCommand = head commands
-              let initial = Dir "/" M.empty
-              if isRoot firstCommand then return (fst $ buildTree initial (tail commands)) else fail "Initial command was not move to root"
+              rawCommands <- sepEndBy1 parseCommand eol
+              let commands = buildCommands rawCommands
+              return $ runCommands [] commands M.empty 
 
-buildTree :: FileTree -> [Command] -> (FileTree, [Command])
-buildTree ft [] = (ft, [])
-buildTree ft ((Change ".."):cs) = (ft, cs)
-buildTree (Dir n contents) ((Change x):cs) = let downFt = Y.fromJust $ M.lookup x contents
-                                                 (nextFt, left) = buildTree downFt cs
-                                                 newContents = M.insert x nextFt contents
-                                             in case left of
-                                                  [] -> ((Dir n newContents), [])
-                                                  xs -> buildTree (Dir n newContents) xs
-buildTree ft@(Dir name contents) ((ListSource xs):cs) = let newContents = foldl insContent contents xs
-                                                        in buildTree ft cs
+runCommands :: [String] -> [Command] -> FileSystem -> FileSystem
+runCommands _ [] fs = fs
+runCommands dirs ((Change "/"):cs) fs = runCommands ["/"] cs fs
+runCommands (dir:ds) ((Change ".."):cs) fs = runCommands ds cs fs
+runCommands dirs ((Change name):cs) fs = runCommands (name:dirs) cs fs
+runCommands dirs@(dir:ds) ((ListSource contents):cs) fs = let newFs = M.insert (concat dirs) contents fs
+                                                       in runCommands dirs cs newFs 
+runCommands _ _ fs = error "how did I get here"
 
-insContent :: M.Map String FileTree -> FileTree -> M.Map String FileTree
-insContent contents d@(Dir name nested) = M.insert name d contents
-insContent contents f@(File size name) = M.insert name f contents
+buildCommands :: [Raw] -> [Command]
+buildCommands [] = []
+buildCommands ((C name):cs) = (Change name):(buildCommands cs)
+buildCommands ((L):cs) = let contents = takeWhile isContent cs
+                             rest = dropWhile isContent cs
+                         in (ListSource (map toFt contents)):(buildCommands rest)
 
-isRoot :: Command -> Bool
-isRoot (Change "/") = True
-isRoot _ = False
+toFt :: Raw -> FileObject
+toFt (D name) = Dir name
+toFt (F size name) = File size name
+toFt _ = error "unable to convert"
 
+isContent :: Raw -> Bool
+isContent (D _) = True
+isContent (F _ _) = True
+isContent _ = False
 
-parseFtFile :: (Monad m) => ParsecT Void String m FileTree
+parseFtFile :: (Monad m) => ParsecT Void String m Raw
 parseFtFile = do
                 size <- read <$> some digitChar
                 spaceChar
                 name <- some (letterChar <|> char '.')
-                eol
-                return (File size name)
+                return (F size name)
 
-parseDir :: (Monad m) => ParsecT Void String m FileTree
+parseDir :: (Monad m) => ParsecT Void String m Raw
 parseDir = do
             string "dir "
             name <- some letterChar
-            eol
-            return (Dir name M.empty)
+            return (D name)
 
-parseCommand :: (Monad m) => ParsecT Void String m Command
-parseCommand = do
-                string "$ "
-                com <- parseChange <|> parseList
-                return com
+parseCommand :: (Monad m) => ParsecT Void String m Raw
+parseCommand = parseChange <|> parseList <|> parseDir <|> parseFtFile
 
-parseChange :: (Monad m) => ParsecT Void String m Command
+parseChange :: (Monad m) => ParsecT Void String m Raw
 parseChange = do
-               string "cd "
+               string "$ cd "
                name <- string "/" <|> some letterChar <|> string ".."
-               return (Change name) 
+               return (C name) 
 
-parseList :: (Monad m) => ParsecT Void String m Command
+parseList :: (Monad m) => ParsecT Void String m Raw
 parseList = do
-             string "ls"
-             eol
-             contents <- manyTill (parseDir <|> parseFtFile) (notFollowedBy (parseDir <|> parseFtFile))
-             return (ListSource contents)
+             string "$ ls"
+             return L 
