@@ -12,3 +12,9 @@ parseFile parser filepath = do
         Left e -> error $ "Failed to parse: " ++ show e
         Right x -> return x
 
+
+type Position = (Int, Int)
+
+mapPos :: [[a]] -> [(Position, a)]
+mapPos xs = zipWith mapPos' [0..] xs
+        where mapPos' i ys = zipWith (\j y -> ((i, j), y)) ys
