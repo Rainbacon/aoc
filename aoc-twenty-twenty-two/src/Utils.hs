@@ -4,13 +4,15 @@ module Utils (
   , Grid
   , aStar
   , mapPos
+  , tostr
 ) where
 
-import Debug.Trace
 import Control.Monad.IO.Class
 import Control.Monad.State as ST
+import qualified Data.Char as C
 import qualified Data.Map as M
 import qualified Data.Set as S
+import qualified Data.Maybe as Y
 import Data.Void
 import Text.Megaparsec
 
@@ -40,7 +42,7 @@ aStar target grid constructNeighbors = do
     if ((x, y) == target)
     then return distance
     else do
-        let newPaths = trace ("Point is" ++ show p) constructNeighbors (x, y) grid
+        let newPaths = constructNeighbors (x, y) grid
         let unseenPaths = filter (\node -> not $ S.member (fst node) seen) newPaths
         let newQueue = insertPaths (map (fmap (+distance)) unseenPaths) $ tail queue
         ST.put (newQueue, S.insert (x,y) seen)
@@ -60,3 +62,12 @@ insertPath a@(p, v1) inserted q@(b@(x, v2):xs) | p == x && v1 >= v2 = q
                                                | p == x = a:(insertPath a True xs)
                                                | v2 >= v1 = a:(insertPath a True q)
                                                | otherwise = b:(insertPath a inserted xs)
+
+tostr :: Point -> Grid -> Visited -> String
+tostr p g v = let rows = maximum . (map fst) $ M.keys g
+                  cols = maximum . (map snd) $ M.keys g
+                  cell r c | (r, c) == p = 'H'
+                           | S.member (r, c) v = 'X'
+                           | otherwise = C.chr . (+96) . Y.fromJust $ M.lookup (r,c) g
+                  row r = map (cell r) [0..cols]
+              in unlines $ map row [0..rows]

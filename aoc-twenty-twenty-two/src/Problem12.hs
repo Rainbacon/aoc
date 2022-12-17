@@ -18,7 +18,12 @@ runEasy fp = do
     return $ show $ ST.evalState (aStar end points generateNeighbors) initialState
 
 runHard :: FilePath -> IO String
-runHard _ = return ""
+runHard fp = do
+    input <- readFile fp
+    let (_, end, points) = parseInput $ lines input
+    let starts = M.keys $ M.filter (== 1) points
+    let initialState = (zip starts (repeat 0), S.empty)
+    return $ show $ ST.evalState (aStar end points generateNeighbors) initialState
 
 parseInput :: [String] -> InputType
 parseInput xs = let positions = mapPos xs
@@ -39,5 +44,5 @@ generateNeighbors :: Point -> Grid -> [(Point, Int)]
 generateNeighbors (x, y) g = let height = Y.fromJust $ M.lookup (x, y) g
                                  points = [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
                                  mappedPoints = map (\a -> (a, M.lookup a g)) points 
-                                 valid = map (\(p, mv) -> (p, fmap (\i -> abs (i - height) < 2) mv)) mappedPoints
+                                 valid = map (\(p, mv) -> (p, fmap (\i -> (i - height) < 2) mv)) mappedPoints
                              in zip (map fst $ filter (Y.fromJust . snd) $ filter (Y.isJust . snd) valid) (repeat 1)
