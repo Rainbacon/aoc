@@ -1,7 +1,7 @@
 module Problem13 where
 
-import Debug.Trace
 import qualified Data.List as L
+import qualified Data.Set as S
 import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char
@@ -16,25 +16,33 @@ instance Show Packet where
     show (List xs) = "[" ++ concat (L.intersperse ", " (map show xs)) ++ "]"
 
 instance Ord Packet where
-    compare (Val a) (Val b) | a < b = LT
-                            | a > b = GT
-                            | otherwise = EQ
+    compare (Val a) (Val b) = compare a b
     compare (List ps) (Val a) = compare (List ps) (List [Val a])
     compare (Val a) (List ps) = compare (List [Val a]) (List ps)
     compare (List xs) (List ys) = bailFold xs ys
-                              where bailFold [] xs = LT
-                                    bailFold xs [] = GT
-                                    bailFold (x:xs) (y:ys) | compare x y == EQ = bailFold xs ys
-                                                           | otherwise = compare x y
+                              where bailFold [] [] = EQ
+                                    bailFold [] bs = LT
+                                    bailFold as [] = GT
+                                    bailFold (a:as) (b:bs) | compare a b == EQ = bailFold as bs
+                                                           | otherwise = compare a b
 
 runEasy :: FilePath -> IO String
 runEasy fp = do
     input <- parseFile parseInput fp
     let indexed = zip [1..] input
-    return $ show $ sum $ map (\x -> trace (show x) fst x) $ filter (\(i, (a, b)) -> a <= b) indexed
+    return $ show $ sum $ map fst $ filter (\(i, (a, b)) -> compare a b == LT) indexed
 
 runHard :: FilePath -> IO String
-runHard _ = return ""
+runHard fp = do
+    input <- parseFile parseInput fp
+    let allPackets = concat $ map (\(x, y) -> [x,y]) $ input
+    return $ show $ product $ map fst $ filter isDivider $ zip [1..] $ L.sort (dividers ++ allPackets)
+
+isDivider :: (Int, Packet) -> Bool
+isDivider (_, p) = S.member p $ S.fromList dividers
+
+dividers :: [Packet]
+dividers = [List [List [Val 2]], List [List [Val 6]]]
 
 parseInput :: (Monad m) => ParsecT Void String m [PacketPair]
 parseInput = sepEndBy1 parsePair eol
