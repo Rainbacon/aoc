@@ -98,9 +98,6 @@ parseMonkey = do
     let cases = M.fromList [(True, trueCase), (False, falseCase)]
     return (num, Monkey items op test cases) 
 
-parseInt :: (Monad m) => ParsecT Void String m Int
-parseInt = read <$> some digitChar
-
 parsePlus :: (Monad m) => ParsecT Void String m (Int -> Int)
 parsePlus = do
              string "+ "

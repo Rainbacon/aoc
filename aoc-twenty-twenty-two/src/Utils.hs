@@ -1,5 +1,6 @@
 module Utils (
     parseFile 
+  , parseInt
   , Point
   , Grid
   , aStar
@@ -71,3 +72,6 @@ tostr p g v = let rows = maximum . (map fst) $ M.keys g
                            | otherwise = C.chr . (+96) . Y.fromJust $ M.lookup (r,c) g
                   row r = map (cell r) [0..cols]
               in unlines $ map row [0..rows]
+
+parseInt :: (Monad m) => ParsecT Void String m Int
+parseInt = read <$> some digitChar
