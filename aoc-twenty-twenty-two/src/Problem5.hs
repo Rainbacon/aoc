@@ -75,9 +75,6 @@ parseMoves = some parseMove
                     eol
                     return (n, s, t)
 
-parseInt :: (Monad m) => ParsecT Void String m Int
-parseInt = read <$> some digitChar
-
 buildPiles :: [[Maybe Char]] -> [Int] -> Piles
 buildPiles rows indices = let inf = repeat Nothing
                               infLists = map (\x -> x ++ inf) rows

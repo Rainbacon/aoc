@@ -56,12 +56,12 @@ parseInput = sepEndBy1 parsePair eol
 parsePacket :: (Monad m) => ParsecT Void String m Packet
 parsePacket = do
     char '['
-    elements <- sepBy (parseInt <|> parsePacket) (char ',')
+    elements <- sepBy (parseIntPacket <|> parsePacket) (char ',')
     char ']'
     return (List elements)
 
-parseInt :: (Monad m) => ParsecT Void String m Packet
-parseInt = do
-    i <- read <$> some digitChar
+parseIntPacket :: (Monad m) => ParsecT Void String m Packet
+parseIntPacket = do
+    i <- parseInt
     return (Val i)
 

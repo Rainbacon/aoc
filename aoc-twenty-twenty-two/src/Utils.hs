@@ -16,6 +16,7 @@ import qualified Data.Set as S
 import qualified Data.Maybe as Y
 import Data.Void
 import Text.Megaparsec
+import Text.Megaparsec.Char
 
 parseFile :: (MonadIO m) => ParsecT Void String m a -> FilePath -> m a
 parseFile parser filepath = do

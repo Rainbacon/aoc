@@ -53,9 +53,6 @@ parseInput = sepEndBy1 parseMove eol
                             dis <- parseInt
                             return (dir, dis)
 
-parseInt :: (Monad m) => ParsecT Void String m Int
-parseInt = read <$> some digitChar
-
 parseD :: (Monad m) => ParsecT Void String m Dir
 parseD = do
           char 'D'
