@@ -7,16 +7,18 @@ import Text.Megaparsec
 import Text.Megaparsec.Char
 import Utils
 
-type Line = (Point, Point)
-
 runEasy :: FilePath -> IO String
 runEasy fp = do
     input <- parseFile parseInput fp
     let st = constructRocks input
-    return $ show $ length $ takeWhile (Y.fromJust . fst) $ scanl dropSand st [0..]
+    return $ show $ length $ takeWhile (Y.isJust . fst) $ scanl dropSand st [0..]
 
 runHard :: FilePath -> IO String
-runHard _ = return ""
+runHard fp = do
+    input <- parseFile parseInput fp
+    let floor = findFloor input
+    let st = constructRocks (floor:input)
+    return $ show $ length $ takeWhile (not . isSand) $ scanl dropSand st [0..]
 
 parseInput :: (Monad m) => ParsecT Void String m [Line]
 parseInput = concat <$> sepEndBy1 parseLine eol
@@ -36,6 +38,20 @@ collectPoints [] = []
 collectPoints (x:[]) = error "only one point"
 collectPoints (x:y:[]) = [(x,y)]
 collectPoints (x:y:xs) = (x,y):(collectPoints (y:xs))
+
+isSand :: (Maybe Point, [String]) -> Bool
+isSand (Nothing, _) = True
+isSand ((Just (x, y)), grid) = (grid !! x) !! y == 'o'
+
+findFloor :: [Line] -> Line
+findFloor xs = let allPoints = concat $ map (\(a, b) -> [a,b]) xs
+                   xCoords = map fst allPoints
+                   yCoords = map snd allPoints
+                   height = maximum xCoords + 2
+                   width = 2 * height - 1
+                   minY = min (minimum yCoords - 5) (500 - width)
+                   maxY = max (maximum yCoords + 5) (500 + width)
+               in ((height, minY), (height, maxY))
 
 constructRocks :: [Line] -> (Maybe Point, [String])
 constructRocks xs = let allPoints = concat $ map (\(a, b) -> [a,b]) xs
@@ -62,7 +78,7 @@ dropSand (Nothing, grid) _ = (Nothing, grid)
 dropSand ((Just p), grid) _ = let landing = dropSand' p grid
                               in case landing of
                                 Nothing -> (Nothing, grid)
-                                (Just q) -> (p, updateGrid grid q)
+                                (Just q) -> ((Just p), updateGrid grid q)
 
 dropSand' :: Point -> [String] -> Maybe Point
 dropSand' (x, y) grid | x >= length grid = Nothing

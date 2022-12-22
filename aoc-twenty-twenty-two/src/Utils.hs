@@ -2,6 +2,9 @@ module Utils (
     parseFile 
   , parseInt
   , Point
+  , Line
+  , intersects
+  , length'
   , Grid
   , aStar
   , mapPos
@@ -28,6 +31,7 @@ parseFile parser filepath = do
 
 
 type Point = (Int, Int)
+type Line = (Point, Point)
 type Grid = M.Map Point Int
 
 mapPos :: [[a]] -> [(Point, a)]
@@ -75,4 +79,22 @@ tostr p g v = let rows = maximum . (map fst) $ M.keys g
               in unlines $ map row [0..rows]
 
 parseInt :: (Monad m) => ParsecT Void String m Int
-parseInt = read <$> some digitChar
+parseInt = parsePositive <|> parseNegative
+
+parsePositive :: (Monad m) => ParsecT Void String m Int
+parsePositive = read <$> some digitChar
+
+parseNegative :: (Monad m) => ParsecT Void String m Int
+parseNegative = do
+    char '-'
+    ((-1) *) <$> parsePositive
+
+
+intersects :: Line -> Point -> Bool
+intersects ((x1, y1), (x2, y2)) (x, y) | x1 == x2 = x == x1 && (min y1 y2) <= y && y <= (max y1 y2)
+                                       | y1 == y2 = y == y1 && (min x1 x2) <= x && x <= (max x1 x2)
+                                       | otherwise = False
+
+length' :: Line -> Int
+length' ((x1, y1), (x2, y2)) | x1 == x2 = 1 + abs (y1 - y2)
+                             | otherwise = 1 + abs (x1 - x2)
