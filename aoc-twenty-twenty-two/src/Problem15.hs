@@ -9,6 +9,7 @@ import Utils
 
 type Sensor = (Point, Point)
 type Beacons = [Point]
+type Equation = (Int, (Int, Int))
 
 runEasy :: FilePath -> IO String
 runEasy fp = do
@@ -21,8 +22,9 @@ runEasy fp = do
 runHard :: FilePath -> IO String
 runHard fp = do
     input <- parseFile parseInput fp
-    let (s1, s2) = findPair input
-    let (x, y) = findPoint s1 s2
+    let eqns = concat $ map findLines input
+    let points = map findIntersection eqns <*> eqns
+    let (x, y) = Y.fromJust $ head $ filter (Y.fromJust . (fmap inBounds)) $ filter ((testPoint input) . Y.fromJust) $ filter Y.isJust points
     return $ show $ 4000000 * x + y
     
 
@@ -72,29 +74,29 @@ combineLines (x:xs) = let combos = map (combine x) xs
                         True -> (x:combineLines combos')
                         False -> combineLines combos'
 
-findPair :: [Sensor] -> (Sensor, Sensor)
-findPair xs = let sensorPairs = map checkPair xs <*> xs
-              in snd $ head $ filter (id . fst) sensorPairs
-
-checkPair :: Sensor -> Sensor -> (Bool, (Sensor, Sensor))
-checkPair s1 s2 = (distSensors == (2 + d1 + d2), (s1, s2))
-    where distSensors = dist (fst s1) (fst s2)
-          d1 = uncurry dist s1
-          d2 = uncurry dist s2
-
 dist :: Point -> Point -> Int
 dist (x1, y1) (x2, y2) = abs (x2 - x1) + abs (y2 - y1)
 
-findPoint :: Sensor -> Sensor -> Point
-findPoint (p@(x1, y1), b) ((x2, y2), _) = let ds = (x2 - x1, y2 - y1)
-                                              slope = findSlope ds
-                                              r1 = dist p b
-                                              line = scanl (add slope) p [0..]
-                                        in head $ dropWhile ((<= r1) . (dist p)) line
+findLines :: Sensor -> [Equation]
+findLines (s@(x1, y1), b@(x2, y2)) = let radius = (2 + dist s b) `div` 2
+                                         points = [(-1, (x1 - radius, y1 - radius)), (-1, (x1 + radius, y1 + radius)), (1, (x1 + radius, y1 - radius)), (1, (x1 - radius, y1 + radius))]
+                                     in map makeEqn points
 
-findSlope :: (Int, Int) -> (Int, Int)
-findSlope (x, y) | x > y = (x `div` y, 1)
-                 | otherwise = (1, y `div` x)
+makeEqn :: (Int, Point) -> Equation
+makeEqn (slope, (x, y)) = (slope, (0, b))
+                    where b = x - (slope * y) 
 
-add :: (Int, Int) -> Point -> Int -> Point
-add (dx, dy) (x, y) _ = (x + dx, y + dy)
+findIntersection :: Equation -> Equation -> Maybe Point
+findIntersection (m1, (_, b1)) (m2, (_, b2)) | m1 == m2 = Nothing
+                                             | m1 == 1 = Just ((b2 - b1) `div` 2, b1 + (b2 - b1) `div` 2)
+                                             | otherwise = Just ((b1 - b2) `div` 2, b2 + (b1 - b2) `div` 2)
+
+testPoint :: [Sensor] -> Point -> Bool
+testPoint sensors point = all (test' point) sensors
+    where test' p s = dist p (fst s) > (uncurry dist s)
+
+--inBounds :: Point -> Bool
+--inBounds (x, y) = x >= 0 && x <= 4000000 && y >= 0 && y <= 4000000
+
+inBounds :: Point -> Bool
+inBounds (x, y) = x >= 0 && x <= 20 && y >= 0 && y <= 20
