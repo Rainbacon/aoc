@@ -84,7 +84,7 @@ findLines (s@(x1, y1), b@(x2, y2)) = let radius = (2 + dist s b) `div` 2
 
 makeEqn :: (Int, Point) -> Equation
 makeEqn (slope, (x, y)) = (slope, (0, b))
-                    where b = x - (slope * y) 
+                    where b = y - (slope * x) 
 
 findIntersection :: Equation -> Equation -> Maybe Point
 findIntersection (m1, (_, b1)) (m2, (_, b2)) | m1 == m2 = Nothing
@@ -95,8 +95,5 @@ testPoint :: [Sensor] -> Point -> Bool
 testPoint sensors point = all (test' point) sensors
     where test' p s = dist p (fst s) > (uncurry dist s)
 
---inBounds :: Point -> Bool
---inBounds (x, y) = x >= 0 && x <= 4000000 && y >= 0 && y <= 4000000
-
 inBounds :: Point -> Bool
-inBounds (x, y) = x >= 0 && x <= 20 && y >= 0 && y <= 20
+inBounds (x, y) = x >= 0 && x <= 4000000 && y >= 0 && y <= 4000000
