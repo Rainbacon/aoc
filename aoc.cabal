@@ -1,0 +1,126 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.35.1.
+--
+-- see: https://github.com/sol/hpack
+
+name:           aoc
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/aoc-twenty-twenty-two#readme>
+homepage:       https://github.com/rainbacon/aoc#readme
+bug-reports:    https://github.com/rainbacon/aoc/issues
+author:         Rainbacon
+maintainer:     example@example.com
+copyright:      2022 Rainbacon
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    CHANGELOG.md
+
+source-repository head
+  type: git
+  location: https://github.com/rainbacon/aoc
+
+library
+  exposed-modules:
+      AOCTypes
+      Problems2022
+      Problems2022.Problem1
+      Problems2022.Problem10
+      Problems2022.Problem11
+      Problems2022.Problem12
+      Problems2022.Problem13
+      Problems2022.Problem14
+      Problems2022.Problem15
+      Problems2022.Problem16
+      Problems2022.Problem17
+      Problems2022.Problem18
+      Problems2022.Problem19
+      Problems2022.Problem2
+      Problems2022.Problem20
+      Problems2022.Problem21
+      Problems2022.Problem22
+      Problems2022.Problem23
+      Problems2022.Problem24
+      Problems2022.Problem25
+      Problems2022.Problem3
+      Problems2022.Problem4
+      Problems2022.Problem5
+      Problems2022.Problem6
+      Problems2022.Problem7
+      Problems2022.Problem8
+      Problems2022.Problem9
+      Problems2023
+      Problems2023.Problem1
+      Problems2023.Problem10
+      Problems2023.Problem11
+      Problems2023.Problem12
+      Problems2023.Problem13
+      Problems2023.Problem14
+      Problems2023.Problem15
+      Problems2023.Problem16
+      Problems2023.Problem17
+      Problems2023.Problem18
+      Problems2023.Problem19
+      Problems2023.Problem2
+      Problems2023.Problem20
+      Problems2023.Problem21
+      Problems2023.Problem22
+      Problems2023.Problem23
+      Problems2023.Problem24
+      Problems2023.Problem25
+      Problems2023.Problem3
+      Problems2023.Problem4
+      Problems2023.Problem5
+      Problems2023.Problem6
+      Problems2023.Problem7
+      Problems2023.Problem8
+      Problems2023.Problem9
+      Utils
+  other-modules:
+      Paths_aoc
+  hs-source-dirs:
+      src
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+  build-depends:
+      base >=4.7 && <5
+    , containers >=0.6.5.1 && <0.7
+    , megaparsec
+    , mtl
+    , transformers
+  default-language: Haskell2010
+
+executable aoc
+  main-is: Main.hs
+  other-modules:
+      Paths_aoc
+  hs-source-dirs:
+      app
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aoc
+    , base >=4.7 && <5
+    , containers >=0.6.5.1 && <0.7
+    , megaparsec
+    , mtl
+    , transformers
+  default-language: Haskell2010
+
+test-suite aoc-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_aoc
+  hs-source-dirs:
+      test
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aoc
+    , base >=4.7 && <5
+    , containers >=0.6.5.1 && <0.7
+    , megaparsec
+    , mtl
+    , transformers
+  default-language: Haskell2010
