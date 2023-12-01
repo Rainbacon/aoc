@@ -1,5 +1,7 @@
 module Problems2022 (problems) where
 
+import qualified Data.Map as M
+
 import qualified Problems2022.Problem1 as P1
 import qualified Problems2022.Problem2 as P2
 import qualified Problems2022.Problem3 as P3
@@ -15,7 +17,7 @@ import qualified Problems2022.Problem12 as P12
 import qualified Problems2022.Problem13 as P13
 import qualified Problems2022.Problem14 as P14
 import qualified Problems2022.Problem15 as P15
-import qualified Problems2022.Problem16 as P16
+-- import qualified Problems2022.Problem16 as P16
 import qualified Problems2022.Problem17 as P17
 import qualified Problems2022.Problem18 as P18
 import qualified Problems2022.Problem19 as P19
@@ -45,7 +47,7 @@ problemsEasy = M.fromList [("1", P1.runEasy)
                           ,("13", P13.runEasy)
                           ,("14", P14.runEasy)
                           ,("15", P15.runEasy)
-                          ,("16", P16.runEasy)
+                          -- ,("16", P16.runEasy)
                           ,("17", P17.runEasy)
                           ,("18", P18.runEasy)
                           ,("19", P19.runEasy)
@@ -73,7 +75,7 @@ problemsHard = M.fromList [("1", P1.runHard)
                           ,("13", P13.runHard)
                           ,("14", P14.runHard)
                           ,("15", P15.runHard)
-                          ,("16", P16.runHard)
+                          -- ,("16", P16.runHard)
                           ,("17", P17.runHard)
                           ,("18", P18.runHard)
                           ,("19", P19.runHard)

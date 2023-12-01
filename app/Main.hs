@@ -13,14 +13,14 @@ import qualified Problems2023 as P2023
 main :: IO ()
 main = do
     putStrLn "What year would you like to run?"
-    year <- getLne
+    year <- getLine
     putStrLn "What day would you like to run?"
     day <- getLine
     putStrLn "Do you want to (T)est or (R)un the code?"
     inputType <- getLine
     putStrLn "Would you like to run the (E)asy or (H)ard version?"
     problemType <- getLine
-    let fileName = getFileName day inputType
+    let fileName = getFileName year day inputType
     let (problemsEasy, problemsHard) = Y.fromJust $ M.lookup year allProblems
     case problemType of
         "E" -> do
@@ -33,10 +33,10 @@ main = do
                 putStrLn output
 
 
-getFileName :: String -> String -> String
-getFileName day "T" = "data/" ++ year ++ "/" ++ day ++ "/test.txt"
-getFileName day "R" = "data/" ++ year ++ "/" ++ day ++ "/input.txt"
-getFileName _ i = error "no input ifle found for option " ++ i
+getFileName :: String -> String -> String -> String
+getFileName year day "T" = "data/" ++ year ++ "/" ++ day ++ "/test.txt"
+getFileName year day "R" = "data/" ++ year ++ "/" ++ day ++ "/input.txt"
+getFileName _ _ i = error "no input ifle found for option " ++ i
 
 getInputData :: String -> IO (String, Handle)
 getInputData fileName = do
