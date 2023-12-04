@@ -9,6 +9,7 @@ module Utils (
   , aStar
   , mapPos
   , tostr
+  , distribute
 ) where
 
 import Control.Monad.IO.Class
@@ -98,3 +99,7 @@ intersects ((x1, y1), (x2, y2)) (x, y) | x1 == x2 = x == x1 && (min y1 y2) <= y 
 length' :: Line -> Int
 length' ((x1, y1), (x2, y2)) | x1 == x2 = 1 + abs (y1 - y2)
                              | otherwise = 1 + abs (x1 - x2)
+
+
+distribute :: (a, [b]) -> [(a, b)]
+distribute (a, bs) = map ((,) a) bs
