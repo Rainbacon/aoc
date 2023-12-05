@@ -1,6 +1,7 @@
 module Utils (
     parseFile 
   , parseInt
+  , parseInteger
   , Point
   , Line
   , intersects
@@ -81,6 +82,11 @@ tostr p g v = let rows = maximum . (map fst) $ M.keys g
 
 parseInt :: (Monad m) => ParsecT Void String m Int
 parseInt = parsePositive <|> parseNegative
+
+parseInteger :: (Monad m) => ParsecT Void String m Integer
+parseInteger = do
+    i <- parseInt
+    return $ toInteger i
 
 parsePositive :: (Monad m) => ParsecT Void String m Int
 parsePositive = read <$> some digitChar
