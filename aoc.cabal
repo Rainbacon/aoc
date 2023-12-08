@@ -26,6 +26,7 @@ source-repository head
 library
   exposed-modules:
       AOCTypes
+      Args
       Problems2022
       Problems2022.Problem1
       Problems2022.Problem10
@@ -90,6 +91,7 @@ library
     , megaparsec
     , mtl
     , transformers
+    , optparse-applicative
   default-language: Haskell2010
 
 executable aoc
@@ -106,6 +108,7 @@ executable aoc
     , megaparsec
     , mtl
     , transformers
+    , optparse-applicative
   default-language: Haskell2010
 
 test-suite aoc-test
@@ -123,4 +126,5 @@ test-suite aoc-test
     , megaparsec
     , mtl
     , transformers
+    , optparse-applicative
   default-language: Haskell2010

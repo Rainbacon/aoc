@@ -1,42 +1,39 @@
 module Main (main) where
 
 import Control.Monad.IO.Class
+import Options.Applicative (execParser)
 import System.IO
 import qualified Data.Map as M
 import qualified Data.Maybe as Y
 
 import AOCTypes (ProblemSet)
+import Args
 import qualified Problems2022 as P2022
 import qualified Problems2023 as P2023
 
 
 main :: IO ()
 main = do
-    putStrLn "What year would you like to run?"
-    year <- getLine
-    putStrLn "What day would you like to run?"
-    day <- getLine
-    putStrLn "Do you want to (T)est or (R)un the code?"
-    inputType <- getLine
-    putStrLn "Would you like to run the (E)asy or (H)ard version?"
-    problemType <- getLine
-    let fileName = getFileName year day inputType
+    options <- execParser opts
+    let year = optYear options
+    let day = optDay options
+    let inputType = optMode options
+    let problemType = optPart options
+    let fileName = getFileName year day ++ show inputType
     let (problemsEasy, problemsHard) = Y.fromJust $ M.lookup year allProblems
     case problemType of
-        "E" -> do
-                let problem = Y.fromJust $ M.lookup day problemsEasy
-                output <- problem fileName
-                putStrLn output
-        "H" -> do
-                let problem = Y.fromJust $ M.lookup day problemsHard
-                output <- problem fileName
-                putStrLn output
+        EasyProblem -> do
+                        let problem = Y.fromJust $ M.lookup day problemsEasy
+                        output <- problem fileName
+                        putStrLn output
+        HardProblem -> do
+                        let problem = Y.fromJust $ M.lookup day problemsHard
+                        output <- problem fileName
+                        putStrLn output
 
 
-getFileName :: String -> String -> String -> String
-getFileName year day "T" = "data/" ++ year ++ "/" ++ day ++ "/test.txt"
-getFileName year day "R" = "data/" ++ year ++ "/" ++ day ++ "/input.txt"
-getFileName _ _ i = error "no input ifle found for option " ++ i
+getFileName :: String -> String -> String
+getFileName year day = "data/" ++ year ++ "/" ++ day ++ "/"
 
 getInputData :: String -> IO (String, Handle)
 getInputData fileName = do
