@@ -3,6 +3,8 @@ module Main (main) where
 import Control.Monad.IO.Class
 import Options.Applicative (execParser)
 import System.IO
+import System.CPUTime
+import Text.Printf
 import qualified Data.Map as M
 import qualified Data.Maybe as Y
 
@@ -24,12 +26,20 @@ main = do
     case problemType of
         EasyProblem -> do
                         let problem = Y.fromJust $ M.lookup day problemsEasy
+                        start <- getCPUTime
                         output <- problem fileName
-                        putStrLn output
+                        end <- getCPUTime
+                        putStrLn $ "Answer: " ++ output
+                        let diff = (fromIntegral (end - start)) / (10^12)
+                        printf "Computation time: %0.3f sec\n" (diff :: Double)
         HardProblem -> do
                         let problem = Y.fromJust $ M.lookup day problemsHard
+                        start <- getCPUTime
                         output <- problem fileName
-                        putStrLn output
+                        end <- getCPUTime
+                        putStrLn $ "Answer: " ++ output
+                        let diff = (fromIntegral (end - start)) / (10^12)
+                        printf "Computation time: %0.3f sec\n" (diff :: Double)
 
 
 getFileName :: String -> String -> String

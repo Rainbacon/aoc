@@ -11,6 +11,10 @@ module Utils (
   , mapPos
   , tostr
   , distribute
+  , Point3D
+  , fst3
+  , snd3
+  , thd3
 ) where
 
 import Control.Monad.IO.Class
@@ -33,6 +37,7 @@ parseFile parser filepath = do
 
 
 type Point = (Int, Int)
+type Point3D = (Int, Int, Int)
 type Line = (Point, Point)
 type Grid = M.Map Point Int
 
@@ -109,3 +114,12 @@ length' ((x1, y1), (x2, y2)) | x1 == x2 = 1 + abs (y1 - y2)
 
 distribute :: (a, [b]) -> [(a, b)]
 distribute (a, bs) = map ((,) a) bs
+
+fst3 :: (a, b, c) -> a
+fst3 (a, b, c) = a
+
+snd3 :: (a, b, c) -> b
+snd3 (a, b, c) = b
+
+thd3 :: (a, b, c) -> c
+thd3 (a, b, c) = c
