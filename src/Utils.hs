@@ -1,5 +1,6 @@
 module Utils (
     parseFile 
+  , parseFast
   , parseInt
   , parseInteger
   , Point
@@ -9,12 +10,14 @@ module Utils (
   , Grid
   , aStar
   , mapPos
+  , inBounds
   , tostr
   , distribute
   , Point3D
   , fst3
   , snd3
   , thd3
+  , splitOn
 ) where
 
 import Control.Monad.IO.Class
@@ -35,6 +38,11 @@ parseFile parser filepath = do
         Left e -> error $ "Failed to parse: " ++ show e
         Right x -> return x
 
+parseFast :: (MonadIO m) => (String -> a) -> FilePath -> m a
+parseFast f fp = do
+    input <- liftIO $ readFile fp
+    return $ f input 
+
 
 type Point = (Int, Int)
 type Point3D = (Int, Int, Int)
@@ -44,6 +52,11 @@ type Grid = M.Map Point Int
 mapPos :: [[a]] -> [(Point, a)]
 mapPos xs = concat $ zipWith mapPos' [0..] xs
         where mapPos' i ys = zipWith (\j y -> ((i, j), y)) [0..] ys
+
+inBounds :: [[a]] -> Point -> Bool
+inBounds grid (x, y) = let mx = length grid 
+                           my = length $ head grid
+                       in x >= 0 && x < mx && y >= 0 && y < my
 
 type Visited = S.Set Point
 type PrioQueue = [(Point, Int)]
@@ -123,3 +136,9 @@ snd3 (a, b, c) = b
 
 thd3 :: (a, b, c) -> c
 thd3 (a, b, c) = c
+
+splitOn :: (Char -> Bool) -> String -> [String]
+splitOn p s = case dropWhile p s of
+                      "" -> []
+                      s' -> w : splitOn p s''
+                            where (w, s'') = break p s'

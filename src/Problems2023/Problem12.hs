@@ -1,8 +1,6 @@
 module Problems2023.Problem12 where
 
 import qualified Data.Array as A
-import qualified Data.Set as S
-import qualified Data.Maybe as Y
 import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char

@@ -24,7 +24,7 @@ runHard fp = do
     input <- parseFile parseInput fp
     let eqns = concat $ map findLines input
     let points = map findIntersection eqns <*> eqns
-    let (x, y) = Y.fromJust $ head $ filter (Y.fromJust . (fmap inBounds)) $ filter ((testPoint input) . Y.fromJust) $ filter Y.isJust points
+    let (x, y) = Y.fromJust $ head $ filter (Y.fromJust . (fmap inBounds')) $ filter ((testPoint input) . Y.fromJust) $ filter Y.isJust points
     return $ show $ 4000000 * x + y
     
 
@@ -95,5 +95,5 @@ testPoint :: [Sensor] -> Point -> Bool
 testPoint sensors point = all (test' point) sensors
     where test' p s = dist p (fst s) > (uncurry dist s)
 
-inBounds :: Point -> Bool
-inBounds (x, y) = x >= 0 && x <= 4000000 && y >= 0 && y <= 4000000
+inBounds' :: Point -> Bool
+inBounds' (x, y) = x >= 0 && x <= 4000000 && y >= 0 && y <= 4000000

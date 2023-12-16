@@ -1,7 +1,86 @@
 module Problems2023.Problem16 where
 
+import qualified Control.Monad.State as ST
+import qualified Data.Set as S
+import Utils
+import Data.Void
+import Text.Megaparsec
+import Text.Megaparsec.Char
+import Debug.Trace
+
+data Dir = N | S | E | W
+    deriving (Show, Eq, Ord)
+data Tile = Empty | HSplit | VSplit | AngleD | AngleU
+    deriving (Eq)
+type LaserState = (S.Set (Point, Dir), [[Tile]])
+
+toChar :: Tile -> Char
+toChar Empty = '.'
+toChar HSplit = '-'
+toChar VSplit = '|'
+toChar AngleD = '\\'
+toChar AngleU = '/'
+
+showBeams :: S.Set Point -> [[Tile]] -> String
+showBeams beams grid = let rowed = zip [0..] grid
+                           showBeam row col t | S.member (row, col) beams = '#'
+                                              | otherwise = toChar t
+                       in unlines $ map (\(r, row) -> zipWith (showBeam r) [0..] row) rowed
+
 runEasy :: FilePath -> IO String
-runEasy _ = return ""
+runEasy fp = do
+    input <- parseFile parseInput fp
+    let (energized, _) = ST.execState (runLaser (0,0) E) (S.empty, input)
+    return $ show $ S.size $ S.map fst energized
 
 runHard :: FilePath -> IO String
 runHard _ = return ""
+
+
+runLaser :: Point -> Dir -> ST.State LaserState ()
+runLaser p@(x, y) d = do
+    (energized, grid) <- ST.get
+    if not (inBounds grid p) || S.member (p, d) energized
+    then return ()
+    else do
+        let continuations = next p d grid
+        ST.put (S.insert (p, d) energized, grid)
+        mapM_ (uncurry runLaser) continuations
+
+
+next :: Point -> Dir -> [[Tile]] -> [(Point, Dir)]
+next (x, y) N grid | curr == AngleU = [((x, y + 1), E)]
+                   | curr == AngleD = [((x, y - 1), W)]
+                   | curr == HSplit = [((x, y - 1), W), ((x, y + 1), E)]
+                   | otherwise = [((x - 1, y), N)]
+                 where curr = (grid !! x) !! y
+next (x, y) S grid | curr == AngleU = [((x, y - 1), W)]
+                   | curr == AngleD = [((x, y + 1), E)]
+                   | curr == HSplit = [((x, y - 1), W), ((x, y + 1), E)]
+                   | otherwise = [((x + 1, y), S)]
+                 where curr = (grid !! x) !! y
+next (x, y) E grid | curr == AngleU = [((x - 1, y), N)]
+                   | curr == AngleD = [((x + 1, y), S)]
+                   | curr == VSplit = [((x - 1, y), N), ((x + 1, y), S)]
+                   | otherwise = [((x, y + 1), E)]
+                 where curr = (grid !! x) !! y
+next (x, y) W grid | curr == AngleU = [((x + 1, y), S)]
+                   | curr == AngleD = [((x - 1, y), N)]
+                   | curr == VSplit = [((x - 1, y), N), ((x + 1, y), S)]
+                   | otherwise = [((x, y - 1), W)]
+                 where curr = (grid !! x) !! y
+
+
+--- Parsing ---
+parseInput :: (Monad m) => ParsecT Void String m [[Tile]]
+parseInput = sepEndBy1 parseRow eol
+
+parseRow :: (Monad m) => ParsecT Void String m [Tile]
+parseRow = many parseTile
+
+parseTile :: (Monad m) => ParsecT Void String m Tile
+parseTile = (char '.' *> pure Empty) 
+        <|> (char '|' *> pure VSplit)
+        <|> (char '-' *> pure HSplit)
+        <|> (char '/' *> pure AngleU)
+        <|> (char '\\' *> pure AngleD)

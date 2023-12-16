@@ -1,8 +1,6 @@
 module Main (main) where
 
-import Control.Monad.IO.Class
 import Options.Applicative (execParser)
-import System.IO
 import System.CPUTime
 import Text.Printf
 import qualified Data.Map as M
@@ -28,29 +26,22 @@ main = do
                         let problem = Y.fromJust $ M.lookup day problemsEasy
                         start <- getCPUTime
                         output <- problem fileName
-                        end <- getCPUTime
                         putStrLn $ "Answer: " ++ output
-                        let diff = (fromIntegral (end - start)) / (10^12)
+                        end <- getCPUTime
+                        let diff = (fromIntegral (end - start)) / (1000000000000)
                         printf "Computation time: %0.3f sec\n" (diff :: Double)
         HardProblem -> do
                         let problem = Y.fromJust $ M.lookup day problemsHard
                         start <- getCPUTime
                         output <- problem fileName
-                        end <- getCPUTime
                         putStrLn $ "Answer: " ++ output
-                        let diff = (fromIntegral (end - start)) / (10^12)
+                        end <- getCPUTime
+                        let diff = (fromIntegral (end - start)) / (1000000000000)
                         printf "Computation time: %0.3f sec\n" (diff :: Double)
 
 
 getFileName :: String -> String -> String
 getFileName year day = "data/" ++ year ++ "/" ++ day ++ "/"
-
-getInputData :: String -> IO (String, Handle)
-getInputData fileName = do
-                         handle <- openFile fileName ReadMode
-                         contents <- hGetContents handle
-                         return (contents, handle)
-
 
 allProblems :: M.Map String (ProblemSet, ProblemSet)
 allProblems = M.fromList [("2022", P2022.problems)
