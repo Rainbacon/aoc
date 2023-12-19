@@ -8,9 +8,12 @@ module Utils (
   , intersects
   , length'
   , Grid
+  , CompassDirection(..)
   , aStar
+  , aStar'
   , mapPos
   , inBounds
+  , inBounds'
   , tostr
   , distribute
   , Point3D
@@ -18,6 +21,7 @@ module Utils (
   , snd3
   , thd3
   , splitOn
+  , dist
 ) where
 
 import Control.Monad.IO.Class
@@ -29,6 +33,7 @@ import qualified Data.Maybe as Y
 import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char
+import Debug.Trace
 
 parseFile :: (MonadIO m) => ParsecT Void String m a -> FilePath -> m a
 parseFile parser filepath = do
@@ -58,8 +63,21 @@ inBounds grid (x, y) = let mx = length grid
                            my = length $ head grid
                        in x >= 0 && x < mx && y >= 0 && y < my
 
+inBounds' :: Grid -> Point -> Bool
+inBounds' grid (x, y) = let (mx, my) = maximum $ M.keys grid
+                        in x >= 0 && x <= mx && y >= 0 && y <= my
+
+dist :: Point -> Point -> Int
+dist (x1, y1) (x2, y2) = abs (x2 - x1) + abs (y2 - y1)
+
+data CompassDirection = N | S | E | W
+    deriving (Eq, Ord, Show)
+
 type Visited = S.Set Point
+type VisitedTracked = S.Set (Point, CompassDirection, Int)
 type PrioQueue = [(Point, Int)]
+type PrioQueueTracked = [(Point, Int, CompassDirection, Int)]
+
 
 aStar :: Point -> Grid -> (Point -> Grid -> [(Point, Int)]) -> ST.State (PrioQueue, Visited) Int 
 aStar target grid constructNeighbors = do
@@ -88,6 +106,40 @@ insertPath a@(p, v1) inserted q@(b@(x, v2):xs) | p == x && v1 >= v2 = q
                                                | p == x = a:(insertPath a True xs)
                                                | v2 >= v1 = a:(insertPath a True q)
                                                | otherwise = b:(insertPath a inserted xs)
+
+aStar' :: Point -> Grid -> (Point -> Grid -> CompassDirection -> Int -> [(Point, Int, CompassDirection, Int)]) -> ST.State (PrioQueueTracked, VisitedTracked) Int 
+aStar' target grid constructNeighbors = do
+    (queue, seen) <- ST.get
+    let d@(p@(x, y), distance, dir, mag) = head queue
+    if ((x, y) == target)
+    then return distance
+    else do
+        let newPaths = constructNeighbors (x, y) grid dir mag
+        let unseenPaths = filter (\node -> not $ S.member (toSeen node) seen) newPaths
+        let newQueue = insertPaths' (map (fmap' (+distance)) unseenPaths) $ tail queue
+        ST.put (newQueue, S.insert (p, dir, mag) seen)
+        aStar' target grid constructNeighbors
+
+toSeen :: (Point, Int, CompassDirection, Int) -> (Point, CompassDirection, Int)
+toSeen (a,b,c,d) = (a,c,d)
+
+fmap' :: (b -> e) -> (a, b, c, d) -> (a, e, c, d)
+fmap' f (a, b, c, d) = (a, f b, c, d)
+
+insertPaths' :: [(Point, Int, CompassDirection, Int)] -> PrioQueueTracked -> PrioQueueTracked
+insertPaths' [] q = q
+insertPaths' (x:xs) q = let rest = insertPaths' xs q
+                        in insertPath' x False rest
+
+insertPath' :: (Point, Int, CompassDirection, Int) -> Bool -> PrioQueueTracked -> PrioQueueTracked
+insertPath' x False [] = [x]
+insertPath' x True [] = []
+insertPath' a@(p, _, dir, mag) True (b@(x, _, dir2, mag2):xs) | p == x && dir == dir2 && mag == mag2 = xs
+                                                              | otherwise = b:(insertPath' a True xs)
+insertPath' a@(p, v1, dir, mag) inserted q@(b@(x, v2, dir2, mag2):xs) | p == x && dir == dir2 && mag == mag2 && v1 >= v2 = q
+                                                                      | p == x && dir == dir2 && mag == mag2 = a:(insertPath' a True xs)
+                                                                      | v2 >= v1 = a:(insertPath' a True q)
+                                                                      | otherwise = b:(insertPath' a inserted xs)
 
 tostr :: Point -> Grid -> Visited -> String
 tostr p g v = let rows = maximum . (map fst) $ M.keys g

@@ -24,7 +24,7 @@ runHard fp = do
     input <- parseFile parseInput fp
     let eqns = concat $ map findLines input
     let points = map findIntersection eqns <*> eqns
-    let (x, y) = Y.fromJust $ head $ filter (Y.fromJust . (fmap inBounds')) $ filter ((testPoint input) . Y.fromJust) $ filter Y.isJust points
+    let (x, y) = Y.fromJust $ head $ filter (Y.fromJust . (fmap inBounds'')) $ filter ((testPoint input) . Y.fromJust) $ filter Y.isJust points
     return $ show $ 4000000 * x + y
     
 
@@ -43,10 +43,10 @@ parseInput = sepEndBy1 parseSensor eol
                          return ((x_sen, y_sen), (x_beac, y_beac))
 
 findZone :: Int -> Sensor -> Maybe Line
-findZone col (s@(sx, sy), (bx, by)) | abs (sy - col) < dist = Just ((sx - dx, col), (sx + dx, col))
+findZone col (s@(sx, sy), (bx, by)) | abs (sy - col) < dist' = Just ((sx - dx, col), (sx + dx, col))
                                     | otherwise = Nothing
-    where dist = abs (bx - sx) + abs (by - sy)
-          dx = dist - (abs (sy - col))
+    where dist' = abs (bx - sx) + abs (by - sy)
+          dx = dist' - (abs (sy - col))
 
 getSize :: Beacons -> Line -> Int
 getSize bs l = let numIntersections = filter id $ map (intersects l) bs
@@ -74,9 +74,6 @@ combineLines (x:xs) = let combos = map (combine x) xs
                         True -> (x:combineLines combos')
                         False -> combineLines combos'
 
-dist :: Point -> Point -> Int
-dist (x1, y1) (x2, y2) = abs (x2 - x1) + abs (y2 - y1)
-
 findLines :: Sensor -> [Equation]
 findLines (s@(x1, y1), b@(x2, y2)) = let radius = (2 + dist s b) `div` 2
                                          points = [(-1, (x1 - radius, y1 - radius)), (-1, (x1 + radius, y1 + radius)), (1, (x1 + radius, y1 - radius)), (1, (x1 - radius, y1 + radius))]
@@ -95,5 +92,5 @@ testPoint :: [Sensor] -> Point -> Bool
 testPoint sensors point = all (test' point) sensors
     where test' p s = dist p (fst s) > (uncurry dist s)
 
-inBounds' :: Point -> Bool
-inBounds' (x, y) = x >= 0 && x <= 4000000 && y >= 0 && y <= 4000000
+inBounds'' :: Point -> Bool
+inBounds'' (x, y) = x >= 0 && x <= 4000000 && y >= 0 && y <= 4000000

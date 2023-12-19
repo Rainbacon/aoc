@@ -42,10 +42,6 @@ calcExpanse factor rows cols (x, y) = (x + (factor * length rows'), y + (factor 
                            where rows' = filter (< x) rows
                                  cols' = filter (< y) cols
 
-dist :: Point -> Point -> Int
-dist (x1, y1) (x2, y2) = abs (x2 - x1) + abs (y2 - y1)
-
-
 shouldExpandRow :: Space -> Int -> Bool
 shouldExpandRow space row = (length $ S.filter ((== row) . fst) space) == 0
 

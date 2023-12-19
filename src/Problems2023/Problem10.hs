@@ -9,7 +9,7 @@ import Text.Megaparsec
 import Text.Megaparsec.Char
 import Utils
 
-data Pipe = V | H | NE | NW | SW | SE | G | S
+data Pipe = V | H | NE | NW | SW | SE | G | Start
 type PipeMap = M.Map Point Pipe
 type LoopState = (PipeMap, S.Set Point, Point)
 type Loop = [Point]
@@ -78,11 +78,11 @@ isH _ = False
 
 isV :: Pipe -> Bool
 isV V = True
-isV S = True
+isV Start = True
 isV _ = False
 
 isStart :: Pipe -> Bool
-isStart S = True
+isStart Start = True
 isStart _ = False
 
 findLoop :: LoopState -> Point -> Maybe Loop
@@ -121,7 +121,7 @@ getNext (x1, y1) (x2, y2) (Just SE) | x2 < x1 && y2 == y1 = Just (x2, y2 + 1)
                                     | x2 == x1 && y2 < y1 = Just (x2 + 1, y2)
                                     | otherwise = Nothing
 getNext _ _ (Just G) = Nothing
-getNext _ _ (Just S) = Nothing
+getNext _ _ (Just Start) = Nothing
                                                        
 
 --- Parsing ---
@@ -156,4 +156,4 @@ parseG :: (Monad m) => ParsecT Void String m Pipe
 parseG = char '.' *> pure G
 
 parseS :: (Monad m) => ParsecT Void String m Pipe
-parseS = char 'S' *> pure S
+parseS = char 'S' *> pure Start

@@ -18,9 +18,6 @@ instance Show Tile where
     show Rock = "#"
     show Roll = "O"
 
-data Dir = N | S | E | W
-    deriving (Eq, Show, Ord)
-
 isEmpty :: Tile -> Bool
 isEmpty = (==) Empty
 
@@ -90,7 +87,7 @@ runCycle n = do
 roll' :: Plane -> Point -> Plane
 roll' plane ms = foldl (\acc d -> M.mapKeys (roll acc d ms) acc) plane [N, W, S, E]
 
-roll :: Plane -> Dir -> Point -> Point -> Point
+roll :: Plane -> CompassDirection -> Point -> Point -> Point
 roll plane N m p = let tile = Y.fromJust $ M.lookup p plane
                        col = M.filterWithKey (\k _ -> snd k == snd p && fst k < fst p) plane
                        rocks = M.toDescList $ M.filter isRock col

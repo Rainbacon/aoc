@@ -8,11 +8,9 @@ import Text.Megaparsec
 import Text.Megaparsec.Char
 import Debug.Trace
 
-data Dir = N | S | E | W
-    deriving (Show, Eq, Ord)
 data Tile = Empty | HSplit | VSplit | AngleD | AngleU
     deriving (Eq)
-type LaserState = (S.Set (Point, Dir), [[Tile]])
+type LaserState = (S.Set (Point, CompassDirection), [[Tile]])
 
 toChar :: Tile -> Char
 toChar Empty = '.'
@@ -37,7 +35,7 @@ runHard :: FilePath -> IO String
 runHard _ = return ""
 
 
-runLaser :: Point -> Dir -> ST.State LaserState ()
+runLaser :: Point -> CompassDirection -> ST.State LaserState ()
 runLaser p@(x, y) d = do
     (energized, grid) <- ST.get
     if not (inBounds grid p) || S.member (p, d) energized
@@ -48,7 +46,7 @@ runLaser p@(x, y) d = do
         mapM_ (uncurry runLaser) continuations
 
 
-next :: Point -> Dir -> [[Tile]] -> [(Point, Dir)]
+next :: Point -> CompassDirection -> [[Tile]] -> [(Point, CompassDirection)]
 next (x, y) N grid | curr == AngleU = [((x, y + 1), E)]
                    | curr == AngleD = [((x, y - 1), W)]
                    | curr == HSplit = [((x, y - 1), W), ((x, y + 1), E)]
