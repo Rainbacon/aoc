@@ -1,6 +1,7 @@
 module Problems2022.Problem18 (runEasy, runHard) where
 
 import qualified Control.Monad.State as ST
+import qualified Data.Either as E
 import qualified Data.Maybe as Y
 import qualified Data.Set as S
 import Data.Void
@@ -34,40 +35,41 @@ runHard fp = do
     let maxZ' = maximum $ S.map thd3 drops
     let minZ' = minimum $ S.map thd3 drops
     let bounds = (Bounds maxX' minX' maxY' minY' maxZ' minZ')
-    let filledDrops = ST.execState (runBubbles bounds) drops
-    putStrLn $ show $ S.toList filledDrops
-    return $ show $ sum $ map (countOpen filledDrops) (S.toList filledDrops)
+    let exp = expandBubble drops S.empty S.empty bounds (1,1,1)
+    return $ show $ E.either length length exp
+    -- let (filledDrops, _) = ST.execState (runBubbles bounds) (drops, S.empty)
+    -- putStrLn $ show $ S.toList filledDrops
+    -- return $ show $ sum $ map (countOpen filledDrops) (S.toList filledDrops)
 
-runBubbles :: Bounds -> ST.State Drops ()
+runBubbles :: Bounds -> ST.State (Drops, Drops) ()
 runBubbles b@(Bounds xx nx xy ny xz nz) = do
     let points = [(x, y, z) | x <- [nx..xx], y <- [ny..xy], z <- [nz..xz]]
     mapM_ (runBubble b) points
 
-runBubble :: Bounds -> Point3D -> ST.State Drops ()
+runBubble :: Bounds -> Point3D -> ST.State (Drops, Drops) ()
 runBubble bounds p = do
-    drops <- ST.get
-    let bubble = expandBubble drops S.empty bounds p
-    let fullBubble = concatMaybe ((Just [p]):[bubble])
+    (drops, exterior) <- ST.get
+    let bubble = expandBubble drops S.empty exterior bounds p
+    let fullBubble = concatEither ((Right [p]):[bubble])
     case fullBubble of
-        (Just xs) -> ST.put $ S.union drops (S.fromList xs)
-        Nothing -> return ()
+        (Right xs) -> ST.put $ (S.union drops (S.fromList xs), exterior)
+        (Left xs) -> ST.put $ (drops, S.union exterior (S.fromList xs))
 
-countOpen' :: Drops -> Bounds -> Point3D -> Int
-countOpen' drops bounds point = length $ filter Y.isNothing bubbles 
-                            where adjacent = neighbors point
-                                  potentials = filter (\p -> not $ S.member p drops) adjacent
-                                  bubbles = map (expandBubble drops S.empty bounds) potentials
+concatEither :: [Either [a] [a]] -> Either [a] [a]
+concatEither lst = let ls = E.lefts lst
+                       rs = E.rights lst
+                   in case ls of
+                    [] -> Right $ concat (ls ++ rs)
+                    _ -> Left $ concat (ls ++ rs)
 
-concatMaybe :: [Maybe [a]] -> Maybe [a]
-concatMaybe [] = Just []
-concatMaybe (Nothing:_) = Nothing
-concatMaybe ((Just x):xs) = fmap (\a -> x ++ a) (concatMaybe xs)
-
-expandBubble :: Drops -> Drops -> Bounds -> Point3D -> (Maybe [Point3D]) 
-expandBubble allDrops seen bounds point | S.member point allDrops = (Just [])
-                                        | S.member point seen = (Just [point])
-                                        | outOfBounds bounds point = Nothing
-                                        | otherwise = concatMaybe $ map (expandBubble allDrops (S.insert point seen) bounds) (neighbors point)
+-- Hmm, this method is doing something wrong. Infinite looping on (1,1,1) from actual data set
+-- Should look into generalizing to BFS
+expandBubble :: Drops -> Drops -> Drops -> Bounds -> Point3D -> (Either [Point3D] [Point3D]) 
+expandBubble allDrops seen exterior bounds point | S.member point allDrops = (Right [])
+                                                 | S.member point seen = (Right [point])
+                                                 | S.member point exterior = Left [point]
+                                                 | outOfBounds bounds point = Left [point]
+                                                 | otherwise = concatEither $ map (expandBubble allDrops (S.insert point seen) exterior bounds) (neighbors point)
 
 outOfBounds :: Bounds -> Point3D -> Bool
 outOfBounds bounds (x, y, z) = x >= (maxX bounds) || x <= (minX bounds) || y >= (maxY bounds) || y <= (minY bounds) || z >= (maxZ bounds) || z <= (minZ bounds)

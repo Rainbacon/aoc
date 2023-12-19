@@ -32,8 +32,20 @@ runEasy fp = do
     return $ show $ S.size $ S.map fst energized
 
 runHard :: FilePath -> IO String
-runHard _ = return ""
+runHard fp = do
+    input <- parseFile parseInput fp
+    let x = length input
+    let y = length $ head input
+    let north = map (\n -> ((x - 1, n), N)) [0..y]
+    let south = map (\n -> ((0, n), S)) [0..y]
+    let east = map (\n -> ((n, 0), E)) [0..x]
+    let west = map (\n -> ((n, y - 1), W)) [0..x]
+    return $ show $ maximum $ parallelMap (S.size . uncurry (execLaser input)) (north ++ south ++ east ++ west)
 
+
+execLaser :: [[Tile]] -> Point -> Dir -> S.Set Point
+execLaser grid p d = let (energized, _) = ST.execState (runLaser p d) (S.empty, grid)
+                     in S.map fst energized
 
 runLaser :: Point -> CompassDirection -> ST.State LaserState ()
 runLaser p@(x, y) d = do

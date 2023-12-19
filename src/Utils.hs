@@ -22,10 +22,12 @@ module Utils (
   , thd3
   , splitOn
   , dist
+  , parallelMap
 ) where
 
 import Control.Monad.IO.Class
 import Control.Monad.State as ST
+import GHC.Conc (par)
 import qualified Data.Char as C
 import qualified Data.Map as M
 import qualified Data.Set as S
@@ -194,3 +196,8 @@ splitOn p s = case dropWhile p s of
                       "" -> []
                       s' -> w : splitOn p s''
                             where (w, s'') = break p s'
+
+parallelMap :: (a -> b) -> [a] -> [b]
+parallelMap f (x:xs) = let r = f x
+                       in r `par` r:parallelMap f xs
+parallelMap _ _ = []
