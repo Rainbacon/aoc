@@ -43,7 +43,7 @@ runHard fp = do
     return $ show $ maximum $ parallelMap (S.size . uncurry (execLaser input)) (north ++ south ++ east ++ west)
 
 
-execLaser :: [[Tile]] -> Point -> Dir -> S.Set Point
+execLaser :: [[Tile]] -> Point -> CompassDirection -> S.Set Point
 execLaser grid p d = let (energized, _) = ST.execState (runLaser p d) (S.empty, grid)
                      in S.map fst energized
 
