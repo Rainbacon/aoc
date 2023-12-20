@@ -27,6 +27,7 @@ dependencies:
 - mtl
 - optparse-applicative
 - array >=0.5.4.0
+- lens
 
 ghc-options:
 - -Wall

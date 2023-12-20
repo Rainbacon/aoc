@@ -1,5 +1,6 @@
 module Problems2023.Problem19 (runEasy, runHard) where
 
+import qualified Control.Monad.State as ST
 import qualified Data.Maybe as Y
 import qualified Data.Map as M
 import Utils
@@ -12,7 +13,11 @@ type Workflow = M.Map String [Rule]
 
 data RuleResult = Accept | Reject | Next String
     deriving (Show)
-data Rule = Rule (Part -> Bool) RuleResult
+data Rule = Greater Char Int RuleResult | Less Char Int RuleResult | Default RuleResult
+    deriving (Show)
+type Range = M.Map Char (Int, Int)
+type Mapping = (Range, RuleResult)
+type SankeyState = ([Range], Workflow)
 
 isNext :: RuleResult -> Bool
 isNext (Next s) = True
@@ -22,12 +27,7 @@ fromNext :: RuleResult -> String
 fromNext (Next s) = s
 fromNext res = error $ "fromNext called with " ++ show res
 
-data Part = Part {
-    getX :: Int
-  , getM :: Int
-  , getA :: Int
-  , getS :: Int
-}
+type Part = M.Map Char Int
 
 runEasy :: FilePath -> IO String
 runEasy fp = do
@@ -36,10 +36,26 @@ runEasy fp = do
     return $ show $ sum $ map scorePart accepted
 
 runHard :: FilePath -> IO String
-runHard _ = return ""
+runHard fp = do
+    (flows, _) <- parseFile parseInput fp
+    let initRange = M.fromList [('x', (0, 4000)), ('m', (0, 4000)), ('a', (0, 4000)), ('s', (0, 4000))]
+    let initState = ([], flows)
+
+runFlow' :: String -> Workflow -> Range -> ST.State SankeyState Range
+runFlow' key range = do
+    (_, flows) <- ST.get
+    let rules = Y.fromJust $ M.lookup key flows
+    foldM splitRange range rules
+
+splitRange :: Range -> Rule -> ST.State SankeyState Range
+splitRange range (Default Reject) = return $ M.empty
+splitRange range (Default Accept) = do
+    (accepted, flows) <- ST.get
+    ST.put ((range:accepted), flows)
+splitRange range (Default (Next res)) = runFlow' res range 
 
 scorePart :: Part -> Int
-scorePart (Part a b c d) = a + b + c + d
+scorePart part = sum $ M.elems part
 
 checkPart :: Workflow -> Part -> Bool
 checkPart flows part = let result = runFlow "in" flows part
@@ -51,7 +67,16 @@ runFlow :: String -> Workflow -> Part -> RuleResult
 runFlow key flows part | isNext res = runFlow (fromNext res) flows part
                        | otherwise = res
                      where rules = Y.fromJust $ M.lookup key flows
-                           res = snd $ head $ filter (\(a, _) -> a) $ map (\(Rule fn r) -> (fn part, r)) rules
+                           res = snd $ head $ filter (\(a, _) -> a) $ map (applyRule part) rules
+
+applyRule :: Part -> Rule -> (Bool, RuleResult)
+applyRule part (Greater c n r) | p > n = (True, r)
+                               | otherwise = (False, r)
+                             where p = Y.fromJust $ M.lookup c part
+applyRule part (Less c n r) | p < n = (True, r)
+                            | otherwise = (False, r)
+                          where p = Y.fromJust $ M.lookup c part
+applyRule part (Default r) = (True, r)
 
 
 --- parsing ---
@@ -72,12 +97,12 @@ parseWorkflow = do
 
 parseRule :: (Monad m) => ParsecT Void String m Rule
 parseRule = do
-    part <- (char 'a' *> pure getA) <|> (char 'm' *> pure getM) <|> (char 'x' *> pure getX) <|> (char 's' *> pure getS)
-    fn <- (char '<' *> pure (<)) <|> (char '>' *> pure (>))
+    part <- (char 'a') <|> (char 'm') <|> (char 'x') <|> (char 's')
+    constructor <- (char '<' *> pure (Less)) <|> (char '>' *> pure (Greater))
     num <- parseInt
     char ':'
     result <- (char 'A' *> pure Accept) <|> (char 'R' *> pure Reject) <|> parseNext
-    return $ Rule (\p -> fn (part p) num) result
+    return $ constructor part num result
 
 parseNext :: (Monad m) => ParsecT Void String m RuleResult
 parseNext = do
@@ -87,7 +112,7 @@ parseNext = do
 parseDefault :: (Monad m) => ParsecT Void String m Rule
 parseDefault = do
     target <- (char 'A' *> pure Accept) <|> (char 'R' *> pure Reject) <|> parseNext
-    return $ Rule (\_ -> True) target
+    return $ Default target
 
 parsePart :: (Monad m) => ParsecT Void String m Part
 parsePart = do
@@ -100,4 +125,4 @@ parsePart = do
     string ",s="
     s <- parseInt
     char '}'
-    return $ Part x m a s
+    return $ M.fromList [('x', x), ('m', m), ('a', a), ('s', s)]
