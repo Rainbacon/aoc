@@ -39,19 +39,30 @@ runEasy fp = do
 runHard :: FilePath -> IO String
 runHard fp = do
     (flows, _) <- parseFile parseInput fp
-    let initRange = M.fromList [('x', (0, 4000)), ('m', (0, 4000)), ('a', (0, 4000)), ('s', (0, 4000))]
-    let initState = ([], flows, [(initRage, Next "in")])
+    let initRange = M.fromList [('x', (1, 4000)), ('m', (1, 4000)), ('a', (1, 4000)), ('s', (1, 4000))]
+    let initState = ([], flows, [(initRange, Next "in")])
+    let (accepted, _, _) = ST.execState runFlows initState
+    return $ show $ sum $ map countRange accepted
+
+countRange :: Range -> Int
+countRange range = product $ map (\(l, h) -> h - l + 1) $ M.elems range
 
 runFlows :: ST.State SankeyState Range
 runFlows = do
     (accepted, flows, queue) <- ST.get
     case queue of
         [] -> return $ M.empty
+        ((range, Accept):qs) -> do
+            ST.put (range:accepted, flows, qs)
+            runFlows
+        ((range, Reject):qs) -> do
+            ST.put (accepted, flows, qs)
+            runFlows
         ((range, res):qs) -> do
             ST.put (accepted, flows, qs)
             let key = fromNext res
             let rules = Y.fromJust $ M.lookup key flows
-            foldM splitRange range rules
+            ST.foldM splitRange range rules
             runFlows
 
 splitRange :: Range -> Rule -> ST.State SankeyState Range
@@ -71,7 +82,7 @@ splitRange range (Greater c n res) = do
     let expanded = [low..high]
     let putR = filter (> n) expanded
     let retR = filter (<= n) expanded
-    case len putR of
+    case length putR of
         0 -> return range
         _ -> do 
             let newLow = head putR
@@ -88,7 +99,7 @@ splitRange range (Less c n res) = do
     let expanded = [low..high]
     let putR = filter (< n) expanded
     let retR = filter (>= n) expanded
-    case len putR of
+    case length putR of
         0 -> return range
         _ -> do 
             let newLow = head putR
