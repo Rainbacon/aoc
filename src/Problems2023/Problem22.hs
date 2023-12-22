@@ -16,14 +16,17 @@ runEasy :: FilePath -> IO String
 runEasy fp = do
     input <- parseFile parseInput fp
     let sorted = sortBy (\((_,_,a), _) ((_,_,b), _) -> compare a b) input 
-    let fallen = foldl fall [] sorted
+    let fallen' = foldl (fall False) [] sorted
+    let fallen = map fst fallen'
+    let numFallen = length $ filter (id . snd) fallen'
     return $ show $ length $ filter (checkBrick fallen) [0..(length fallen) - 1]
 
 runHard :: FilePath -> IO String
 runHard fp = do
     input <- parseFile parseInput fp
     let sorted = sortBy (\((_,_,a), _) ((_,_,b), _) -> compare a b) input 
-    let fallen = foldl fall [] sorted
+    let fallen' = foldl (fall False) [] sorted
+    let fallen = reverse $ map fst fallen'
     return $ show $ sum $ map (checkBrick'' fallen) [0..(length fallen) - 1]
 
 checkBrick :: [Brick] -> Int -> Bool
@@ -32,16 +35,17 @@ checkBrick bricks n = let rest = (take n bricks) ++ drop (n + 1) bricks
 
 checkBrick'' :: [Brick] -> Int -> Int
 checkBrick'' bricks n = let rest = (take n bricks) ++ drop (n + 1) bricks
-                        in length $ filter id $ map (checkBrick' rest) [0..(length rest) - 1]
+                            fallen = foldl (fall False) [] rest
+                        in length $ filter (id . snd) fallen
 
 checkBrick' :: [Brick] -> Int -> Bool
 checkBrick' bricks n = let rest = (take n bricks) ++ drop (n + 1) bricks
                            brick = bricks !! n
                        in canFall rest brick
 
-fall :: [Brick] -> Brick -> [Brick]
-fall fallen brick | canFall fallen brick = fall fallen (fall' brick)
-                  | otherwise = brick:fallen
+fall :: Bool -> [(Brick, Bool)] -> Brick -> [(Brick, Bool)]
+fall hasFallen fallen brick | canFall (map fst fallen) brick = fall True fallen (fall' brick)
+                            | otherwise = (brick, hasFallen):fallen
 
 canFall :: [Brick] -> Brick -> Bool
 canFall fallen ((_, _, 1), _) = False
