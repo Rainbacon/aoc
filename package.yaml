@@ -28,6 +28,7 @@ dependencies:
 - optparse-applicative
 - array >=0.5.4.0
 - lens
+- MonadRandom
 
 ghc-options:
 - -Wall

@@ -3,6 +3,7 @@ module Problems2023.Problem20 (runEasy, runHard) where
 import qualified Control.Monad.State as ST
 import qualified Data.Maybe as Y
 import qualified Data.Map as M
+import Data.Bits
 import Utils
 import Data.Void
 import Text.Megaparsec
@@ -28,17 +29,59 @@ targets (Broadcast xs) = xs
 targets (FlipFlop _ xs) = xs
 targets (Conjunction _ xs) = xs
 
+isFlipFlop :: Module -> Bool
+isFlipFlop (FlipFlop _ _) = True
+isFlipFlop _ = False
+
+isConjunction :: Module -> Bool
+isConjunction (Conjunction _ _) = True
+isConjunction _ = False
+
+conjunctionInputs :: Module -> [String]
+conjunctionInputs (Conjunction inputs _) = M.keys inputs
+conjunctionInputs m = error $ "Called conjunctionInputs with" ++ show m
+
 runEasy :: FilePath -> IO String
 runEasy fp = do
   input <- parseFile parseInput fp
   let ((cLow, cHigh), _, _) = ST.execState (runPulses' 1000) ((0, 0), input, False)
   return $ show $ cLow * cHigh
   
-
 runHard :: FilePath -> IO String
 runHard fp = do
   input <- parseFile parseInput fp
-  return $ show $ ST.evalState (runPulses'' 1) ((0, 0), input, False)
+  let broadcastNode = Y.fromJust $ M.lookup "broadcaster" input
+  let counts = map (getCount input) $ targets broadcastNode
+  return $ show $ foldl lcm 1 counts
+
+getCount :: Modules -> String -> Int
+getCount modules start = generateCycle modules conj chain 0
+                     where conj = head $ filter (\el -> isConjunction $ Y.fromJust $ M.lookup el modules) $ targets $ Y.fromJust $ M.lookup start modules
+                           chain = findChain modules start conj
+                           
+
+toMermaid :: (String, Module) -> [String]
+toMermaid (name, Broadcast tgts) = let pre = "    " ++ name ++ " --> "
+                                   in map (pre ++) tgts
+toMermaid (name, FlipFlop _ tgts) = let pre = "    " ++ name ++ "[/" ++ name ++ "/] --> "
+                                    in map (pre ++) tgts
+toMermaid (name, Conjunction _ tgts) = let pre = "    " ++ name ++ "{" ++ name ++ "} --> "
+                                       in map (pre ++) tgts
+
+generateCycle :: Modules -> String -> [String] -> Int -> Int
+generateCycle modules conjunction flipflops n | isReset = n
+                                              | otherwise = generateCycle modules conjunction flipflops (n + 1)
+                                            where inputBits = map snd $ filter (\(flipflop, _) -> flipflop `elem` (conjunctionInputs signal)) $ zip flipflops [0..]
+                                                  signal = Y.fromJust $ M.lookup conjunction modules
+                                                  isReset = all id $ map (testBit n) inputBits
+                                
+findChain :: Modules -> String -> String -> [String]
+findChain modules current target | current == target = []
+                                 | next == [] = [current]
+                                 | otherwise = current : (findChain modules (head next) target)
+                               where conns = M.lookup current modules
+                                     connections = targets $ Y.fromJust $ conns
+                                     next = filter (\el -> isFlipFlop $ Y.fromJust $ M.lookup el modules) connections
 
 runPulses'' :: Int -> ST.State ModuleState Int
 runPulses'' n = do
