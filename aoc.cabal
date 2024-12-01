@@ -79,6 +79,32 @@ library
       Problems2023.Problem7
       Problems2023.Problem8
       Problems2023.Problem9
+      Problems2024
+      Problems2024.Problem1
+      Problems2024.Problem10
+      Problems2024.Problem11
+      Problems2024.Problem12
+      Problems2024.Problem13
+      Problems2024.Problem14
+      Problems2024.Problem15
+      Problems2024.Problem16
+      Problems2024.Problem17
+      Problems2024.Problem18
+      Problems2024.Problem19
+      Problems2024.Problem2
+      Problems2024.Problem20
+      Problems2024.Problem21
+      Problems2024.Problem22
+      Problems2024.Problem23
+      Problems2024.Problem24
+      Problems2024.Problem25
+      Problems2024.Problem3
+      Problems2024.Problem4
+      Problems2024.Problem5
+      Problems2024.Problem6
+      Problems2024.Problem7
+      Problems2024.Problem8
+      Problems2024.Problem9
       Utils
   other-modules:
       Paths_aoc

@@ -3,6 +3,7 @@ module Problems2023.Problem21 (runEasy, runHard) where
 import qualified Data.Map as M
 import qualified Data.Maybe as Y
 import qualified Data.Set as S
+import qualified Control.Monad.State as ST
 import Utils
 import Data.Void
 import Text.Megaparsec
@@ -38,16 +39,16 @@ runStep n points fn garden = runStep (n - 1) newPoints fn garden
                          where newPoints = S.filter (\p -> M.member p garden) allNeighbors
                                allNeighbors = S.foldl (\acc point -> S.union acc (fn point)) S.empty points
 
-bfs :: ST.State (Seen, Queue, Garden) Seen
-bfs = do
-    (seen, queue, garden) <- ST.get
-    case queue of
-        [] -> return seen
-        ((x, n):xs) -> do
-            let nbs = filter (\el -> Y.isJust $ M.lookup el seen) $ S.toList $ neighbors x
-            let newQ = map ((,) (n + 1)) $ filter (\el -> Y.isJust $ M.lookup el garden) nbs
-            ST.put (M.insert x n seen, newQ, garden)
-            bfs
+-- bfs :: ST.State (Seen, Queue, Garden) Seen
+-- bfs = do
+--     (seen, queue, garden) <- ST.get
+--     case queue of
+--         [] -> return seen
+--         ((x, n):xs) -> do
+--             let nbs = filter (\el -> Y.isJust $ M.lookup el seen) $ S.toList $ neighbors x
+--             let newQ = map ((,) (n + 1)) $ filter (\el -> Y.isJust $ M.lookup el garden) nbs
+--             ST.put (M.insert x n seen, newQ, garden)
+--             bfs
 
 neighbors :: Point -> S.Set Point
 neighbors (x, y) = S.fromList [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
