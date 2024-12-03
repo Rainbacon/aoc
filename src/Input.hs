@@ -40,8 +40,8 @@ downloadFromAoc year day = do
         cookie = H.Cookie "session" (C.pack cookieValue) expires "adventofcode.com" "/" now now False False True True
         jar = H.createCookieJar [cookie]
     req <- H.parseRequest $ "https://adventofcode.com/" ++ year ++ "/day/" ++ day ++ "/input"
-    let (request, _) = H.insertCookiesIntoRequest req jar now
-        h = [("UserAgent", "https://github.com/Rainbacon/aoc/blob/master/scripts/init.hs by reynolds.aaron1992@gmail.com")]
-        req2 = request { requestHeaders = h }
-    response <- H.httpLbs req2 httpManager
+    let h = [("User-Agent", "https://github.com/Rainbacon/aoc/blob/master/scripts/init.hs by reynolds.aaron1992@gmail.com")]
+        req2 = req { H.requestHeaders = h }
+        (request, _) = H.insertCookiesIntoRequest req2 jar now
+    response <- H.httpLbs request httpManager
     return $ LB.unpackChars $ H.responseBody response
