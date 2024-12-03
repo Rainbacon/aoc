@@ -2,6 +2,7 @@ module Args (
     opts 
   , ProblemPart (..)
   , AocOptions (..)
+  , InputFile (..)
 ) where
 
 import Options.Applicative

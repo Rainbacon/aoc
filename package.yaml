@@ -29,6 +29,12 @@ dependencies:
 - array >=0.5.4.0
 - lens
 - MonadRandom
+- http-client
+- http-client-tls
+- directory 
+- MissingH
+- time
+- bytestring
 
 ghc-options:
 - -Wall

@@ -8,6 +8,7 @@ import qualified Data.Maybe as Y
 
 import AOCTypes (ProblemSet)
 import Args
+import Input
 import qualified Problems2022 as P2022
 import qualified Problems2023 as P2023
 import qualified Problems2024 as P2024
@@ -22,6 +23,7 @@ main = do
     let problemType = optPart options
     let fileName = getFileName year day ++ show inputType
     let (problemsEasy, problemsHard) = Y.fromJust $ M.lookup year allProblems
+    loadInput options
     case problemType of
         EasyProblem -> do
                         let problem = Y.fromJust $ M.lookup day problemsEasy
