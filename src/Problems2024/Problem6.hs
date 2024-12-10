@@ -9,7 +9,6 @@ import Data.List
 import qualified Data.Map as M
 import qualified Data.Maybe as Y
 import qualified Data.Set as S
-import Debug.Trace
 
 data Direction = U | D | L | R
     deriving (Eq, Ord)
