@@ -128,6 +128,7 @@ library
     , MissingH
     , time
     , bytestring
+    , ghc
   default-language: Haskell2010
 
 executable aoc
@@ -154,6 +155,7 @@ executable aoc
     , MissingH
     , time
     , bytestring
+    , ghc
   default-language: Haskell2010
 
 test-suite aoc-test
@@ -181,4 +183,5 @@ test-suite aoc-test
     , MissingH
     , time
     , bytestring
+    , ghc
   default-language: Haskell2010
