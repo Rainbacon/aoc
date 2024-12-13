@@ -4,7 +4,7 @@ import qualified Data.Set as S
 import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char
-import Utils
+import qualified Utils as U
 
 
 type Position = (Int, Int)
@@ -33,14 +33,14 @@ setPixel s (n, (x, y)) = let row = s !! x
 
 runEasy :: FilePath -> IO String
 runEasy fp = do
-    input <- parseFile parseInput fp
+    input <- U.parseFile parseInput fp
     let init = Rope [(0,0), (0,0)]
     let visited = S.empty
     return $ show $ S.size . snd $ foldl runMove (init, visited) input
 
 runHard :: FilePath -> IO String
 runHard fp = do
-    input <- parseFile parseInput fp
+    input <- U.parseFile parseInput fp
     let init = Rope (replicate 10 (15,11))
     let visited = S.empty
     return $ show $ S.size . snd $ foldl runMove (init, visited) input
@@ -50,7 +50,7 @@ parseInput = sepEndBy1 parseMove eol
          where parseMove = do
                             dir <- parseD <|> parseU <|> parseR <|> parseL
                             char ' '
-                            dis <- parseInt
+                            dis <- U.parseInt
                             return (dir, dis)
 
 parseD :: (Monad m) => ParsecT Void String m Dir

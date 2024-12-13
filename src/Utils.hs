@@ -23,6 +23,9 @@ module Utils (
   , splitOn
   , dist
   , parallelMap
+  , insertPaths
+  , PrioQueue
+  , Visited
 ) where
 
 import Control.Monad.IO.Class

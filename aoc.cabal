@@ -129,6 +129,7 @@ library
     , time
     , bytestring
     , ghc
+    , matrix
   default-language: Haskell2010
 
 executable aoc
@@ -156,6 +157,7 @@ executable aoc
     , time
     , bytestring
     , ghc
+    , matrix
   default-language: Haskell2010
 
 test-suite aoc-test
@@ -184,4 +186,5 @@ test-suite aoc-test
     , time
     , bytestring
     , ghc
+    , matrix
   default-language: Haskell2010
