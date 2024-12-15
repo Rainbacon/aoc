@@ -7,11 +7,12 @@ module Args (
 
 import Options.Applicative
 
-data InputFile = Test | Input
+data InputFile = Test | Input | Custom String
 
 instance Show InputFile where
   show Test = "test.txt"
   show Input = "input.txt"
+  show (Custom a) = a
 
 data ProblemPart = EasyProblem | HardProblem
 
@@ -46,7 +47,7 @@ day = strOption
   <> help "Which day of Advent of code should be run")
 
 mode :: Parser InputFile
-mode = testMode <|> inputMode
+mode = testMode <|> inputMode <|> customMode
 
 testMode :: Parser InputFile
 testMode = flag' Test
@@ -59,6 +60,12 @@ inputMode = flag' Input
   (  long "input"
   <> short 'i'
   <> help "Run the actual input")
+
+customMode :: Parser InputFile
+customMode = Custom <$> strOption 
+  (  long "custom-input"
+  <> short 'c'
+  <> metavar "CUSTOMFILE")
 
 part :: Parser ProblemPart
 part = easyPart <|> hardPart

@@ -17,8 +17,6 @@ loadInput options = do
     let year = optYear options
     let day = optDay options
     case inputType of
-        Test -> do
-            putStrLn "Unable to load test data, please load it manually"
         Input -> do 
             let fileName = U.join "/" ["data", year, day, show inputType]
             fileExists <- doesFileExist fileName
@@ -29,6 +27,8 @@ loadInput options = do
             else do
                 putStrLn "Input already downloaded."
                 return ()
+        otherwise -> do
+            putStrLn "Unable to load test data, please load it manually"
 
 
 downloadFromAoc :: String -> String -> IO String
