@@ -9,9 +9,9 @@ import qualified Data.Maybe as Y
 import AOCTypes (ProblemSet)
 import Args
 import Input
-import qualified Problems2022 as P2022
-import qualified Problems2023 as P2023
-import qualified Problems2024 as P2024
+import qualified Problems.Y2022 as P2022
+import qualified Problems.Y2023 as P2023
+import qualified Problems.Y2024 as P2024
 
 
 main :: IO ()
