@@ -23,24 +23,16 @@ main = do
     let problemType = optPart options
     let fileName = getFileName year day ++ show inputType
     let (problemsEasy, problemsHard) = Y.fromJust $ M.lookup year allProblems
+    let problem = case problemType of 
+                    EasyProblem -> Y.fromJust $ M.lookup day problemsEasy
+                    HardProblem -> Y.fromJust $ M.lookup day problemsHard
     loadInput options
-    case problemType of
-        EasyProblem -> do
-                        let problem = Y.fromJust $ M.lookup day problemsEasy
-                        start <- getCPUTime
-                        output <- problem fileName
-                        putStrLn $ "Answer: " ++ output
-                        end <- getCPUTime
-                        let diff = (fromIntegral (end - start)) / (1000000000000)
-                        printf "Computation time: %0.3f sec\n" (diff :: Double)
-        HardProblem -> do
-                        let problem = Y.fromJust $ M.lookup day problemsHard
-                        start <- getCPUTime
-                        output <- problem fileName
-                        putStrLn $ "Answer: " ++ output
-                        end <- getCPUTime
-                        let diff = (fromIntegral (end - start)) / (1000000000000)
-                        printf "Computation time: %0.3f sec\n" (diff :: Double)
+    start <- getCPUTime
+    output <- problem fileName
+    putStrLn $ "Answer: " ++ output
+    end <- getCPUTime
+    let diff = (fromIntegral (end - start)) / (1000000000)
+    printf "Computation time: %0.3f ms\n" (diff :: Double)
 
 
 getFileName :: String -> String -> String
