@@ -26,6 +26,7 @@ module Utils (
   , insertPaths
   , PrioQueue
   , Visited
+  , fmap'
 ) where
 
 import Control.Monad.IO.Class
@@ -84,18 +85,21 @@ type PrioQueue = [(Point, Int)]
 type PrioQueueTracked = [(Point, Int, CompassDirection, Int)]
 
 
-aStar :: Point -> Grid -> (Point -> Grid -> [(Point, Int)]) -> ST.State (PrioQueue, Visited) Int 
+aStar :: Point -> Grid -> (Point -> Grid -> [(Point, Int)]) -> ST.State (PrioQueue, Visited) (Maybe Int) 
 aStar target grid constructNeighbors = do
     (queue, seen) <- ST.get
-    let d@(p@(x, y), distance) = head queue
-    if ((x, y) == target)
-    then return distance
+    if length queue == 0
+    then return Nothing
     else do
-        let newPaths = constructNeighbors (x, y) grid
-        let unseenPaths = filter (\node -> not $ S.member (fst node) seen) newPaths
-        let newQueue = insertPaths (map (fmap (+distance)) unseenPaths) $ tail queue
-        ST.put (newQueue, S.insert (x,y) seen)
-        aStar target grid constructNeighbors
+        let d@(p@(x, y), distance) = head queue
+        if ((x, y) == target)
+        then return $ Just distance
+        else do
+            let newPaths = constructNeighbors (x, y) grid
+            let unseenPaths = filter (\node -> not $ S.member (fst node) seen) newPaths
+            let newQueue = insertPaths (map (fmap (+distance)) unseenPaths) $ tail queue
+            ST.put (newQueue, S.insert (x,y) seen)
+            aStar target grid constructNeighbors
 
 insertPaths :: [(Point, Int)] -> PrioQueue -> PrioQueue
 insertPaths [] q = q
