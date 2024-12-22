@@ -1,6 +1,6 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.35.1.
+-- This file has been generated from package.yaml by hpack version 0.37.0.
 --
 -- see: https://github.com/sol/hpack
 
@@ -113,25 +113,25 @@ library
       src
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
-      MonadRandom
+      MemoTrie
+    , MissingH
+    , MonadRandom
     , array >=0.5.4.0
     , base >=4.7 && <5
+    , bytestring
     , containers >=0.6.5.1 && <0.7
+    , directory
+    , ghc
+    , http-client
+    , http-client-tls
     , lens
+    , matrix
     , megaparsec
     , mtl
     , optparse-applicative
-    , transformers
-    , http-client
-    , http-client-tls
-    , directory 
-    , MissingH
-    , time
-    , bytestring
-    , ghc
-    , matrix
     , parallel
-    , MemoTrie
+    , time
+    , transformers
   default-language: Haskell2010
 
 executable aoc
@@ -142,26 +142,26 @@ executable aoc
       app
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      MonadRandom
+      MemoTrie
+    , MissingH
+    , MonadRandom
     , aoc
     , array >=0.5.4.0
     , base >=4.7 && <5
+    , bytestring
     , containers >=0.6.5.1 && <0.7
+    , directory
+    , ghc
+    , http-client
+    , http-client-tls
     , lens
+    , matrix
     , megaparsec
     , mtl
     , optparse-applicative
-    , transformers
-    , http-client
-    , http-client-tls
-    , directory 
-    , MissingH
-    , time
-    , bytestring
-    , ghc
-    , matrix
     , parallel
-    , MemoTrie
+    , time
+    , transformers
   default-language: Haskell2010
 
 test-suite aoc-test
@@ -173,24 +173,24 @@ test-suite aoc-test
       test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      MonadRandom
+      MemoTrie
+    , MissingH
+    , MonadRandom
     , aoc
     , array >=0.5.4.0
     , base >=4.7 && <5
+    , bytestring
     , containers >=0.6.5.1 && <0.7
+    , directory
+    , ghc
+    , http-client
+    , http-client-tls
     , lens
+    , matrix
     , megaparsec
     , mtl
     , optparse-applicative
-    , transformers
-    , http-client
-    , http-client-tls
-    , directory 
-    , MissingH
-    , time
-    , bytestring
-    , ghc
-    , matrix
     , parallel
-    , MemoTrie
+    , time
+    , transformers
   default-language: Haskell2010

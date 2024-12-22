@@ -35,6 +35,10 @@ dependencies:
 - MissingH
 - time
 - bytestring
+- ghc
+- matrix
+- parallel
+- MemoTrie
 
 ghc-options:
 - -Wall

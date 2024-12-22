@@ -2,6 +2,7 @@ module Problems2024.Problem21 (runEasy, runHard) where
 
 import Utils
 import Data.Tuple
+import Data.List
 import qualified Data.Map as M
 import qualified Data.Set as S
 import qualified Control.Monad.State as ST
@@ -20,7 +21,7 @@ runEasy fp = do
     return $ show $ sum $ map (\code -> complexity code (evaluate code)) codes
 
 complexity :: String -> String -> Int
-complexity code dirs = trace ("Complexity of " ++ show code ++ " has length " ++ show dirs) $ length dirs * numCode
+complexity code dirs = trace ("Complexity of " ++ show code ++ show dirs ++  " has length " ++ show (length dirs)) $ length dirs * numCode
     where numCode = read (take (length code - 1) code)
 
 reverseKeypad :: Keypad -> ReverseKeypad
@@ -40,10 +41,21 @@ directionalKeypad = M.fromList [
 
 generateSequence :: (Keypad, ReverseKeypad) -> Point -> String -> String
 generateSequence _ _ [] = []
-generateSequence (k, r) p (x:xs) = trace ("Found sequence " ++ s ++ " to move from " ++ show y ++ " to " ++ show x ) $ (generateSequence (k, r) p' xs) ++ s
+generateSequence (k, r) p (x:xs) = (generateSequence (k, r) p' xs) ++ s
     where p' = r M.! x
-          s = 'A' : (ST.evalState (findPath p' k) ([(p, "")], S.empty))
+          s = 'A' : (reverse $ sortBy precedence $ ST.evalState (findPath p' k) ([(p, "")], S.empty))
           y = k M.! p
+
+precedence :: Char -> Char -> Ordering
+precedence '<' _ = GT
+precedence _ '<' = LT
+precedence '^' 'v' = EQ
+precedence '^' _ = GT
+precedence 'v' '^' = EQ
+precedence 'v' _ = GT
+precedence '>' 'A' = EQ
+precedence 'A' '>' = EQ
+precedence _ _ = LT
 
 findPath :: Point -> Keypad -> ST.State ([(Point, String)], S.Set Point) String
 findPath target keypad = do
