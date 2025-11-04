@@ -23,6 +23,18 @@ runEasy fp = do
         path = ST.evalState (findPath target start input) S.empty
     return $ show $ applyCheats path input
 
+applyCheats' :: [Point] -> Int -> Int
+applyCheats' ps = length $ filter (> 99) cheatValues
+    where cheatValues = map value possibleCheats
+          pointPairs = (map (,) ps) <*> ps
+          indices = buildIndices ps 0
+          possibleCheats = filter (\(p, q) -> (dist p q) <= 20 && (indices M.! q) > (indices M.! p)) pointPairs 
+          value (p, q) = ((indices M.! q) - (indices M.! p)) - (dist p q)
+
+buildIndices :: [Point] -> Int -> M.Map Point Int
+buildIndices [] _ = M.empty
+buildIndices (x:xs) n = M.insert x n $ buildIndices xs (n + 1)
+
 applyCheats :: [Point] -> M.Map Point Maze -> Int
 applyCheats [] grid = 0
 applyCheats (p:ps) grid = (length successfulCheats) + applyCheats ps grid
@@ -59,18 +71,6 @@ runHard fp = do
         path = ST.evalState (findPath target start input) S.empty
     putStrLn $ show $ length path
     return $ show $ applyCheats' path
-
-applyCheats' :: [Point] -> Int
-applyCheats' ps = length $ filter (> 99) cheatValues
-    where cheatValues = map value possibleCheats
-          pointPairs = (map (,) ps) <*> ps
-          indices = buildIndices ps 0
-          possibleCheats = filter (\(p, q) -> (dist p q) <= 20 && (indices M.! q) > (indices M.! p)) pointPairs 
-          value (p, q) = ((indices M.! q) - (indices M.! p)) - (dist p q)
-
-buildIndices :: [Point] -> Int -> M.Map Point Int
-buildIndices [] _ = M.empty
-buildIndices (x:xs) n = M.insert x n $ buildIndices xs (n + 1)
 
 parseInput :: (Monad m) => ParsecT Void String m (M.Map Point Maze)
 parseInput = do 
