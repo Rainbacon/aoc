@@ -9,6 +9,7 @@ import qualified Data.Maybe as Y
 import AOCTypes (ProblemSet)
 import Args
 import Input
+import qualified Problems2015 as P2015
 import qualified Problems2022 as P2022
 import qualified Problems2023 as P2023
 import qualified Problems2024 as P2024
@@ -39,7 +40,8 @@ getFileName :: String -> String -> String
 getFileName year day = "data/" ++ year ++ "/" ++ day ++ "/"
 
 allProblems :: M.Map String (ProblemSet, ProblemSet)
-allProblems = M.fromList [("2022", P2022.problems)
+allProblems = M.fromList [("2015", P2015.problems)
+                         ,("2022", P2022.problems)
                          ,("2023", P2023.problems)
                          ,("2024", P2024.problems)
                          ]
