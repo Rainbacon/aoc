@@ -5,6 +5,7 @@ import Text.Megaparsec
 import Text.Megaparsec.Char
 import Data.Void
 import qualified Data.Map as M
+import qualified Data.Maybe as Y
 import Data.Int
 import Data.Bits
 import Debug.Trace
@@ -28,22 +29,19 @@ runEasy fp = do
     wires <- parseFile parseInput fp
     putStrLn "What wire do you seek?"
     wire <- getLine
-    return $ show $ evalWire wire wires
+    return $ show $ wireMemo wire wires
 
-evalWire :: String -> Wires -> Int16
-evalWire wire wires = let gate = trace ("wire " ++ wire ++ " " ++ (show $ M.lookup wire wires)) $ M.lookup wire wires
-    in case gate of
-        Nothing -> error $ "Looked up missign gate " ++ show wire
-        (Just (And' a b)) -> (evalWire' a wires) .&. (evalWire' b wires)
-        (Just (Or a b)) -> (evalWire' a wires) .|. (evalWire' b wires)
-        (Just (Not a)) -> 65535 `xor` (evalWire' a wires)
-        (Just (LShift a n)) -> shift (evalWire' a wires) n
-        (Just (RShift a n)) -> shift (evalWire' a wires) (n * (-1))
-        (Just (Pass a)) -> evalWire' a wires
-
-evalWire' :: GateInput -> Wires -> Int16
-evalWire' (Signal i) _ = i
-evalWire' (Identifier s) ws = evalWire s ws 
+wireMemo :: String -> Wires -> Int16
+wireMemo wire wires = (M.map evalWire wires) M.! wire
+    where evalWire' (Signal i) _ = i
+          evalWire' (Identifier s) ws = wireMemo s ws 
+          evalWire gate = trace (show gate) $ case gate of
+            (And' a b) -> (evalWire' a wires) .&. (evalWire' b wires)
+            (Or a b) -> (evalWire' a wires) .|. (evalWire' b wires)
+            (Not a) -> 65535 `xor` (evalWire' a wires)
+            (LShift a n) -> shift (evalWire' a wires) n
+            (RShift a n) -> shift (evalWire' a wires) (n * (-1))
+            (Pass a) -> evalWire' a wires
 
 runHard :: FilePath -> IO String
 runHard _ = return ""
