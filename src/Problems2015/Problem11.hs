@@ -35,4 +35,6 @@ next :: Int -> Char
 next i = "abcdefghjkmnpqrstuvwxyz" !! i
 
 runHard :: FilePath -> IO String
-runHard _ = return ""
+runHard fp = do
+    input <- parseFast id fp
+    return $ reverse $ head $ tail $ filter isValid $ scanl (\a _ -> increment a) (reverse input) [0..]
