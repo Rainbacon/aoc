@@ -40,6 +40,7 @@ import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char
 import Debug.Trace
+import Data.List
 
 parseFile :: (MonadIO m) => ParsecT Void String m a -> FilePath -> m a
 parseFile parser filepath = do
