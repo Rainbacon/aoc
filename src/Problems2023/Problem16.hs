@@ -2,6 +2,7 @@ module Problems2023.Problem16 where
 
 import qualified Control.Monad.State as ST
 import qualified Data.Set as S
+import Utils.Parsing
 import Utils
 import Data.Void
 import Text.Megaparsec

@@ -5,7 +5,7 @@ import qualified Data.Map as M
 import qualified Data.Maybe as Y
 import qualified Control.Monad.State as ST
 import Control.Monad.Random
-import Utils
+import Utils.Parsing
 import Data.List
 import Data.Void
 import Text.Megaparsec

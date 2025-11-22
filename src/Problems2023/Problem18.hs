@@ -2,6 +2,7 @@ module Problems2023.Problem18 (runEasy, runHard) where
 
 import Control.Lens.Fold
 import qualified Data.Maybe as Y
+import Utils.Parsing
 import Utils
 import Data.Void
 import Text.Megaparsec

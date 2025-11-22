@@ -1,6 +1,6 @@
 module Problems2015.Problem12 (runEasy, runHard) where
 
-import Utils (parseFile, parseInt)
+import Utils.Parsing (parseFile, parseInt)
 import Text.Megaparsec
 import Text.Megaparsec.Char
 import Data.Void

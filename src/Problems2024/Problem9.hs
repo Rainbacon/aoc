@@ -5,7 +5,7 @@ import qualified Data.Maybe as Y
 import Control.Monad.State as ST
 import Text.Megaparsec
 import Text.Megaparsec.Char
-import Utils
+import Utils.Parsing
 import Debug.Trace
 import Data.Char
 

@@ -1,9 +1,5 @@
 module Utils (
-    parseFile 
-  , parseFast
-  , parseInt
-  , parseInteger
-  , Point
+    Point
   , Line
   , intersects
   , length'
@@ -29,31 +25,13 @@ module Utils (
   , fmap'
 ) where
 
-import Control.Monad.IO.Class
 import Control.Monad.State as ST
 import GHC.Conc (par)
 import qualified Data.Char as C
 import qualified Data.Map as M
 import qualified Data.Set as S
 import qualified Data.Maybe as Y
-import Data.Void
-import Text.Megaparsec
-import Text.Megaparsec.Char
-import Debug.Trace
 import Data.List
-
-parseFile :: (MonadIO m) => ParsecT Void String m a -> FilePath -> m a
-parseFile parser filepath = do
-    input <- liftIO $ readFile filepath
-    result <- runParserT parser "Utils.hs" input
-    case result of
-        Left e -> error $ "Failed to parse: " ++ show e
-        Right x -> return x
-
-parseFast :: (MonadIO m) => (String -> a) -> FilePath -> m a
-parseFast f fp = do
-    input <- liftIO $ readFile fp
-    return $ f input 
 
 
 type Point = (Int, Int)
@@ -159,23 +137,6 @@ tostr p g v = let rows = maximum . (map fst) $ M.keys g
                            | otherwise = C.chr . (+96) . Y.fromJust $ M.lookup (r,c) g
                   row r = map (cell r) [0..cols]
               in unlines $ map row [0..rows]
-
-parseInt :: (Monad m) => ParsecT Void String m Int
-parseInt = parsePositive <|> parseNegative
-
-parseInteger :: (Monad m) => ParsecT Void String m Integer
-parseInteger = do
-    i <- parseInt
-    return $ toInteger i
-
-parsePositive :: (Monad m) => ParsecT Void String m Int
-parsePositive = read <$> some digitChar
-
-parseNegative :: (Monad m) => ParsecT Void String m Int
-parseNegative = do
-    char '-'
-    ((-1) *) <$> parsePositive
-
 
 intersects :: Line -> Point -> Bool
 intersects ((x1, y1), (x2, y2)) (x, y) | x1 == x2 = x == x1 && (min y1 y2) <= y && y <= (max y1 y2)

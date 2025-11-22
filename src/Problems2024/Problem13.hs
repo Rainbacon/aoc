@@ -1,5 +1,6 @@
 module Problems2024.Problem13 (runEasy, runHard) where
 
+import Utils.Parsing
 import Utils
 import Text.Megaparsec
 import Text.Megaparsec.Char

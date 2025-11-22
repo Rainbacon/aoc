@@ -1,6 +1,6 @@
 module Problems2015.Problem10 (runEasy, runHard) where
 
-import Utils
+import Utils.Parsing
 
 runEasy :: FilePath -> IO String
 runEasy fp = do

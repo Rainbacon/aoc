@@ -4,7 +4,7 @@ import qualified Control.Monad.State as ST
 import qualified Data.Maybe as Y
 import qualified Data.Map as M
 import Data.Bits
-import Utils
+import Utils.Parsing
 import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char

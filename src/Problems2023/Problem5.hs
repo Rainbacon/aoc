@@ -4,7 +4,7 @@ import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char
 import Debug.Trace
-import Utils
+import Utils.Parsing
 
 data SeedMap = SeedMap {
     destRange :: Integer,

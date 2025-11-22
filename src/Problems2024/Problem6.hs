@@ -1,6 +1,7 @@
 module Problems2024.Problem6 (runEasy, runHard) where
 
 import Control.Monad.State as ST
+import Utils.Parsing
 import Utils
 import Text.Megaparsec
 import Text.Megaparsec.Char

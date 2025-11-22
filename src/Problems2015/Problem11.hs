@@ -1,6 +1,6 @@
 module Problems2015.Problem11 (runEasy, runHard) where
 
-import Utils
+import Utils.Parsing
 import Data.List
 import qualified Data.Maybe as Y
 

@@ -1,5 +1,6 @@
 module Problems2024.Problem21 (runEasy, runHard) where
 
+import Utils.Parsing
 import Utils
 import Data.Tuple
 import Data.List
