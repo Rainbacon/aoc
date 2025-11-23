@@ -134,6 +134,7 @@ library
       Problems2024.Problem9
       Utils
       Utils.Parsing
+      Utils.Grid
   other-modules:
       Paths_aoc
   hs-source-dirs:
