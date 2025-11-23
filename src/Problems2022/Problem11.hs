@@ -7,7 +7,7 @@ import qualified Data.Maybe as Y
 import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char
-import Utils
+import Utils.Parsing
 
 type Item = Int
 data Monkey = Monkey [Item] (Int -> Int) Int (M.Map Bool Int)

@@ -1,5 +1,6 @@
 module Problems2024.Problem12 (runEasy, runHard) where
 
+import Utils.Parsing
 import Utils
 import qualified Data.Map as M
 import qualified Data.Set as S

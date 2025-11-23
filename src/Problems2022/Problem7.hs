@@ -6,7 +6,7 @@ import qualified Data.Maybe as Y
 import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char
-import Utils
+import Utils.Parsing
 
 data Raw = C String | L | D String | F Integer String
     deriving (Show)

@@ -1,6 +1,6 @@
 module Problems2015.Problem4 (runEasy, runHard) where
 
-import Utils
+import Utils.Parsing
 import Data.Hash.MD5
 
 runEasy :: FilePath -> IO String

@@ -3,7 +3,7 @@ module Problems2022.Problem10 where
 import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char
-import Utils
+import Utils.Parsing
 
 data Instruction = Noop | AddX Int
     deriving (Show)

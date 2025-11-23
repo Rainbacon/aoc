@@ -4,6 +4,7 @@ import qualified Data.List as L
 import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char
+import Utils.Parsing
 import Utils
 
 type Signal = (String, String, String)

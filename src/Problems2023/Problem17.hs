@@ -7,6 +7,7 @@ import qualified Data.Maybe as Y
 import qualified Data.Set as S
 import Data.Char
 import Data.List
+import Utils.Parsing
 import Utils
 import Data.Void
 import Text.Megaparsec

@@ -4,7 +4,7 @@ import qualified Data.Char as C
 import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char
-import Utils
+import Utils.Parsing
 
 runEasy :: FilePath -> IO String
 runEasy fp = do

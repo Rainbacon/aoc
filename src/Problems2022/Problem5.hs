@@ -5,7 +5,7 @@ import qualified Data.Maybe as Y
 import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char
-import Utils
+import Utils.Parsing
 
 type Piles = M.Map Int [Char]
 type Move = (Int, Int, Int)

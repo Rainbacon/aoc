@@ -3,7 +3,7 @@ module Problems2023.Problem9 where
 import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char
-import Utils
+import Utils.Parsing
 import Debug.Trace
 
 runEasy :: FilePath -> IO String

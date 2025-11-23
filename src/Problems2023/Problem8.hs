@@ -6,7 +6,7 @@ import qualified Data.Map as M
 import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char
-import Utils
+import Utils.Parsing
 import Debug.Trace
 
 data Direction = R | L

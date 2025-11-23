@@ -5,7 +5,7 @@ import Data.List
 import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char
-import Utils
+import Utils.Parsing
 
 type Elf = [Int]
 

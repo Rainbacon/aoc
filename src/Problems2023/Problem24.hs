@@ -1,6 +1,6 @@
 module Problems2023.Problem24 (runEasy, runHard) where
 
-import Utils
+import Utils.Parsing
 import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char

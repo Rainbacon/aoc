@@ -1,6 +1,7 @@
 module Problems2015.Problem3 (runEasy, runHard) where
 
 import qualified Data.Set as S
+import Utils.Parsing
 import Utils
 import Text.Megaparsec
 import Text.Megaparsec.Char

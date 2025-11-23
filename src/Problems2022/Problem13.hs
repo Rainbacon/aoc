@@ -5,7 +5,7 @@ import qualified Data.Set as S
 import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char
-import Utils
+import Utils.Parsing
 
 data Packet = List [Packet] | Val Int
     deriving (Eq)

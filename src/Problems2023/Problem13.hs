@@ -4,7 +4,7 @@ import Data.List
 import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char
-import Utils
+import Utils.Parsing
 import Debug.Trace
 
 runEasy :: FilePath -> IO String

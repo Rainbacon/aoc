@@ -1,6 +1,6 @@
 module Problems2023.Problem1 (runEasy, runHard) where
 
-import Utils
+import Utils.Parsing
 import Data.Char
 import Data.List
 import Data.Maybe

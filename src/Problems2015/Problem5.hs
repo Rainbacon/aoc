@@ -1,6 +1,6 @@
 module Problems2015.Problem5 (runEasy, runHard) where
 
-import Utils
+import Utils.Parsing
 import qualified Data.Map as M
 
 runEasy :: FilePath -> IO String

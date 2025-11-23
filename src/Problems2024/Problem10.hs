@@ -4,6 +4,7 @@ import qualified Data.Map as M
 import qualified Data.Set as S
 import qualified Data.Maybe as Y
 import qualified Control.Monad.State as ST
+import Utils.Parsing
 import Utils
 
 runEasy :: FilePath -> IO String

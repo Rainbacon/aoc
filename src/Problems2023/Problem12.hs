@@ -4,7 +4,7 @@ import qualified Data.Array as A
 import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char
-import Utils
+import Utils.Parsing
 import Debug.Trace
 
 data Spring = Op | Dam | Unkn
