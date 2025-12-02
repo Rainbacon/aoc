@@ -3,6 +3,7 @@ module Utils.Parsing (
   , parseFast
   , parseInt
   , parseInteger
+  , parsePositive
 ) where
 
 
