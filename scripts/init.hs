@@ -7,10 +7,12 @@ main :: IO ()
 main = do
     putStrLn "What is the year?"
     year <- getLine
+    putStrLn "How many days is this year's puzzle?"
+    days <- read <$> getLine
     putStrLn $ "Initializing " ++ year ++ "..."
     let dirName = "src/Problems" ++ year
     createDirectory dirName
-    mapM_ (createDayFile dirName year) [1..25]
+    mapM_ (createDayFile dirName year) [1..days]
     createYearFile year
 
 createDayFile :: FilePath -> String -> Int -> IO ()
