@@ -4,6 +4,8 @@ module Utils.Grid (
   , toChar
   , constructGrid
   , displayGrid
+  , Point
+  , neighbors
 ) where
 
 import Utils (Point, mapPos)
@@ -14,6 +16,9 @@ type Grid a = M.Map Point a
 
 constructGrid :: [[a]] -> Grid a
 constructGrid = M.fromList . mapPos
+
+neighbors :: Point -> [Point]
+neighbors p@(a, b) = filter (/= p) [(a+x, b+y) | x <- [-1,0,1], y <- [-1,0,1]]
 
 class GridShow a where
     toChar :: a -> Char

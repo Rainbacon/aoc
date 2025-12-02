@@ -39,6 +39,7 @@ dependencies:
 - matrix
 - parallel
 - MemoTrie
+- queues >= 1.0.0
 
 ghc-options:
 - -Wall

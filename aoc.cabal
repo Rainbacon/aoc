@@ -135,6 +135,7 @@ library
       Utils
       Utils.Parsing
       Utils.Grid
+      Utils.Search
   other-modules:
       Paths_aoc
   hs-source-dirs:
@@ -160,6 +161,7 @@ library
     , parallel
     , time
     , transformers
+    , queues >= 1.0.0
   default-language: Haskell2010
 
 executable aoc
@@ -190,6 +192,7 @@ executable aoc
     , parallel
     , time
     , transformers
+    , queues
   default-language: Haskell2010
 
 test-suite aoc-test
@@ -221,4 +224,5 @@ test-suite aoc-test
     , parallel
     , time
     , transformers
+    , queues
   default-language: Haskell2010
