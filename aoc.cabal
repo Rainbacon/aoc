@@ -146,9 +146,9 @@ library
       Problems2025.Problem8
       Problems2025.Problem9
       Utils
-      Utils.Parsing
       Utils.Grid
       Utils.Search
+      Utils.Parsing
   other-modules:
       Paths_aoc
   hs-source-dirs:
