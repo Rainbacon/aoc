@@ -5,40 +5,26 @@ import Utils.Search
 import Text.Megaparsec
 import Text.Megaparsec.Char
 import Data.Void
-import qualified Data.Map as M
-
-data Light = Off | On
-    deriving (Eq, Ord, Show)
-
-toggle :: Light -> Light
-toggle On = Off
-toggle Off = On
-
-off :: Light -> Light
-off _ = Off
-
-on :: Light -> Light
-on _ = On
+import Data.Bits
+import Debug.Trace
 
 data Machine = Machine {
-    lights :: M.Map Int Light
-  , buttons :: [[Int]]
+    lights :: Int
+  , buttons :: [Int]
   , joltages :: [Int]
-}
+} deriving (Show)
 
 runEasy :: FilePath -> IO String
 runEasy fp = do
     machines <- parseFile (sepEndBy1 parseMachine eol) fp
-    return $ show $ take 65 $ map reachTarget machines
+    let val = map findTarget machines
+    return $ show $ val !! 62
 
-reachTarget :: Machine -> Int
-reachTarget (Machine ls bs _) = bfs (M.map off ls) ls (pushButtons bs)
+findTarget :: Machine -> Int
+findTarget (Machine ls bs _) = bfs 0 ls (pushButtons bs)
 
-pushButtons :: [[Int]] -> M.Map Int Light -> [M.Map Int Light]
-pushButtons btns initial = map (pushButton initial) btns
-
-pushButton :: M.Map Int Light -> [Int] -> M.Map Int Light
-pushButton ls b = foldl (\l i -> M.adjust toggle i l) ls b
+pushButtons :: [Int] -> Int -> [Int]
+pushButtons bs ls = map (xor ls) bs
 
 runHard :: FilePath -> IO String
 runHard _ = return ""
@@ -48,14 +34,22 @@ parseMachine = do
     ls <- char '[' >> some parseLight <* string "] "
     bs <- sepEndBy1 parseButton (char ' ')
     js <- char '{' >> (sepBy1 parseInt (char ',')) <* char '}'
-    return $ Machine (M.fromList $ zip [0..] ls) bs js
+    return $ Machine (constructLight ls) bs js
 
-parseLight :: (Monad m) => ParsecT Void String m Light
-parseLight = (char '.' >> pure Off) <|> (char '#' >> pure On)
+constructLight :: [Bool] -> Int
+constructLight ls = fromBits bitsSet
+    where indexed = zip [0..] ls
+          bitsSet = map fst $ filter (id . snd) indexed 
 
-parseButton :: (Monad m) => ParsecT Void String m [Int]
+fromBits :: [Int] -> Int
+fromBits bs = foldl setBit 0 bs
+
+parseLight :: (Monad m) => ParsecT Void String m Bool
+parseLight = (char '.' >> pure False) <|> (char '#' >> pure True)
+
+parseButton :: (Monad m) => ParsecT Void String m Int
 parseButton = do
     char '('
     indices <- sepBy1 parseInt (char ',')
     char ')'
-    return indices
+    return $ fromBits indices

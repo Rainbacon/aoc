@@ -16,7 +16,8 @@ data BfsState a = BfsState {
 }
 
 instance (Show a) => Show (BfsState a) where
-    show (BfsState s q g) = "{\n  seen: " ++ show s ++ ",\n  queue: " ++ show q ++ ",\n  goal: " ++ show "\n}"
+    show (BfsState _ Q.Empty _) = "queue is empty"
+    show (BfsState s (Q.Full h q) g) = "{\n  queue: " ++ show h ++ ",\n  goal: " ++ show g "\n}"
 
 bfs :: (Eq a, Ord a, Show a) => a -> a -> (a -> [a]) -> Int
 bfs start goal findNeighbors = ST.evalState (bfs' findNeighbors) initial
@@ -31,7 +32,7 @@ bfs' findNeighbors = do
             if node == (goal state)
             then return i
             else do 
-                let neighbors = findNeighbors node
+                let neighbors = trace (show state) $ findNeighbors node
                 ST.modify ((addSeen node) . (enqueueAll neighbors (i + 1)))
                 bfs' findNeighbors
 
