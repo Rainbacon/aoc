@@ -17,7 +17,7 @@ data BfsState a = BfsState {
 
 instance (Show a) => Show (BfsState a) where
     show (BfsState _ Q.Empty _) = "queue is empty"
-    show (BfsState s (Q.Full h q) g) = "{\n  queue: " ++ show h ++ ",\n  goal: " ++ show g "\n}"
+    show (BfsState s (Q.Full h q) g) = "{\n  queue: " ++ show h ++ ",\n  goal: " ++ show g ++ "\n}"
 
 bfs :: (Eq a, Ord a, Show a) => a -> a -> (a -> [a]) -> Int
 bfs start goal findNeighbors = ST.evalState (bfs' findNeighbors) initial
