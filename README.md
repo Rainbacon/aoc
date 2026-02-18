@@ -24,6 +24,14 @@ the file should live in the `data/<YEAR>/<DAY>` directory. By default, the runne
 user's unique input. You can use a file of a different name by specifying it with `-c CUSTOMFILE` but the file still needs to be in that directory. 
 
 ## Project Structure
+Each solution is implemented in is own module which exposes an interface of two functions
 
-Solutions are grouped into modules based on the year of the challenge. Each of these modules exposes the following type `problems :: (Map String (FilePath -> IO String), Map String (FilePath -> IO String))`. The first element of the tuple is a mapping between the day of the challenge and the part 1 solution. The second element
-is a mapping between the day of the challenge and the part 2 solution. Each solution exposes two functions `runEasy :: FilePath -> IO String` and `runHard :: FilePath -> IO String` which get assembled into the map returned out of the year's module. The runner passes a file handle into each solution function which is then responsible for reading the input from the file as it sees fit. Most solutions will operate either on the raw string values contained in the file or parse them using [Megaparsec](https://hackage.haskell.org/package/megaparsec). For this reason, the `Utils.Parsing` package provides two helper functions `parseFile` which runs the file text through a supplied parser and `parseFast` which applies a `String -> a` transformation function to the text of the file. 
+```
+runEasy :: FilePath -> IO String
+runHard :: FilePath -> IO String
+```
+
+The solution functions take a file path as their input and are themselves responsible for reading the input from the file and performing the logic of the solution. This allows each solution to parse the input however it makes sense. Most of the solutions parse the input either by applying a `String -> a` transformation function or by running a parser creted using [Megaparsec](https://hackage.haskell.org/package/megaparsec). The `Utils.Parsing` module provides two helpers `parseFile :: (MonadIO m) => ParsecT Void String m a -> FilePath -> m a` and `parseFast :: (MonadIO m) => (String -> a) -> FilePath -> m a` which handle reading the input from the file and passing the loaded string to the parsing function.
+
+The solutions are bundled into a module for each year of the competition. The solutions for each year of the competition are assembled into a module that exposes a tuple containing a collection of the part 1 solutions and a collection of the part 2 solutions. The collections are implemented as maps where the keys are the day of
+the competition and the values are the solution functions.
